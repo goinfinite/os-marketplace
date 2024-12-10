@@ -35,7 +35,7 @@
 		"type": "email",
 		"specificText": "email",
 		"isRequired": true
-		}
+	  }
 	],
 	"installCmdSteps": [
 	  "if [[ $(echo -n \"%adminPassword%\" | wc -m) -lt 12 ]]; then echo -n AdminPasswordTooShort >&2; exit 1; fi",
