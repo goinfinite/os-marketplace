@@ -42,7 +42,7 @@
 	  }
 	],
 	"installCmdSteps": [
-	  "mv %marketplaceCatalogItemAssetsDirPath%/wp-cli.phar /usr/local/bin/wp",
+	  "cp -u %marketplaceCatalogItemAssetsDirPath%/wp-cli.phar /usr/local/bin/wp",
 	  "os runtime php update -n %installHostname% -v 8.2",
 	  "wp core download --path=%installDirectory% --locale=%locale% --allow-root",
 	  "os db create -n wpDb_%installUuid% -t mysql",
