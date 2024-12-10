@@ -19,25 +19,27 @@
 		"name": "adminUsername",
 		"label": "Admin Username",
 		"type": "text",
+		"specificText": "username",
 		"isRequired": true
 	  },
 	  {
 		"name": "adminPassword",
 		"label": "Admin Password",
 		"type": "password",
+		"specificText": "password",
 		"isRequired": true
 	  },
 	  {
 		"name": "adminMailAddress",
 		"label": "Admin Email",
 		"type": "email",
+		"specificText": "email",
 		"isRequired": true
-	  }
+		}
 	],
 	"installCmdSteps": [
 	  "if [[ $(echo -n \"%adminPassword%\" | wc -m) -lt 12 ]]; then echo -n AdminPasswordTooShort >&2; exit 1; fi",
-	  "curl -skL -o %installTempDir%/joomla.zip https://goinfinite.net/assets/os/marketplace/joomla/joomla.zip",
-	  "unzip -o %installTempDir%/joomla.zip -d %installDirectory%",
+	  "unzip -o %marketplaceCatalogItemAssetsDirPath%/joomla-5.1.4-stable.zip -d %installDirectory%",
 	  "os db create -n joomlaDb_%installUuid% -t mysql",
 	  "os db create-user -n joomlaDb_%installUuid% -t mysql -u joomlaUser_%installUuid% -p %installRandomPassword% -r all",
 	  "os runtime php update -n %installHostname% -v 8.2",
@@ -80,4 +82,4 @@
 	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/joomla/assets/screenshot-2.jpg",
 	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/joomla/assets/screenshot-3.jpg"
 	]
-  }
+}
