@@ -18,12 +18,14 @@
 		"name": "adminUsername",
 		"label": "Admin Username",
 		"type": "text",
+		"specificType": "username",
 		"isRequired": true
 	  },
 	  {
 		"name": "adminPassword",
 		"label": "Admin Password",
 		"type": "password",
+		"specificType": "password",
 		"isRequired": true
 	  },
 	  {
