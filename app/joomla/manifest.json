@@ -39,7 +39,8 @@
 	],
 	"installCmdSteps": [
 	  "if [[ $(echo -n \"%adminPassword%\" | wc -m) -lt 12 ]]; then echo -n AdminPasswordTooShort >&2; exit 1; fi",
-	  "unzip -o %marketplaceCatalogItemAssetsDirPath%/joomla-5.1.4-stable.zip -d %installDirectory%",
+	  "curl -skL -o %installTempDir%/joomla.zip https://goinfinite.net/assets/os/marketplace/joomla/joomla.zip",
+	  "unzip -o %installTempDir%/joomla.zip -d %installDirectory%",
 	  "os db create -n joomlaDb_%installUuid% -t mysql",
 	  "os db create-user -n joomlaDb_%installUuid% -t mysql -u joomlaUser_%installUuid% -p %installRandomPassword% -r all",
 	  "os runtime php update -n %installHostname% -v 8.2",

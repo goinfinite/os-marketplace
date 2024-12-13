@@ -28,7 +28,8 @@ dataFields:
     type: email
     isRequired: true
 installCmdSteps:
-  - unzip -o %marketplaceCatalogItemAssetsDirPath%/opencart-4.0.2.3.zip -d %installTempDir%
+  - curl -skL -o %installTempDir%/opencart.zip https://goinfinite.net/assets/os/marketplace/opencart/opencart.zip
+  - unzip -o %installTempDir%/opencart.zip -d %installTempDir%
   - mv %installTempDir%/opencart-*/upload/* %installDirectory%
   - cp %installDirectory%/config-dist.php %installDirectory%/config.php
   - cp %installDirectory%/admin/config-dist.php %installDirectory%/admin/config.php
