@@ -20,7 +20,7 @@ Below is a mapping of repository versions and the respective Infinite OS version
 | -- | -- | -- |
 | `v0` | [`v0.0.1`](https://github.com/goinfinite/os/releases/tag/v0.0.1) [`v0.0.2`](https://github.com/goinfinite/os/releases/tag/v0.0.2) [`v0.0.4`](https://github.com/goinfinite/os/releases/tag/v0.0.4) [`v0.0.6`](https://github.com/goinfinite/os/releases/tag/v0.0.6) [`v0.0.7`](https://github.com/goinfinite/os/releases/tag/v0.0.7)<br/> [`v0.0.9`](https://github.com/goinfinite/os/releases/tag/v0.0.9) [`v0.1.0`](https://github.com/goinfinite/os/releases/tag/v0.1.0) [`v0.1.2`](https://github.com/goinfinite/os/releases/tag/v0.1.2) [`v0.1.5`](https://github.com/goinfinite/os/releases/tag/v0.1.5) | `v1` |
 
-## Manifest properties
+## Manifest/Schema Properties
 These manifests have their own property structure, which is read by Infinite OS during the management of these catalog items. The supported formats are JSON (`.json`) and YAML (`.yml`, `.yaml`).
 
 [WordPress example](https://github.com/goinfinite/os-marketplace/blob/main/app/wordpress/manifest.json).
@@ -42,7 +42,7 @@ These manifests have their own property structure, which is read by Infinite OS 
 | `avatarUrl` | string | yes | _The URL for the catalog item's image, used for illustration purposes._ |
 | `screenshotUrls` | []string | no | _List of URL for the catalog item's screenshots, used for static demonstration purposes._ |
 
-## System data fields
+## System Data Fields
 The system's data fields are predefined values used by Infinite OS to replace placeholders in installation commands. They are similar to the data fields in the manifests themselves, but these are provided by Infinite OS. These placeholders are denoted by `%` at the beginning and end, such as `%adminName%`.
 
 The repository will automatically substitute these placeholders with the appropriate values during the installation process. For example:
@@ -55,14 +55,14 @@ In this example, `%installDirectory%` will be replaced by the installation direc
 
 Below is a table of all available system data fields for creating manifests:
 
-| Name | Description |
-| -- | -- |
-| `installDirectory` | _Path to the directory where all files created by the catalog item installation will be located._ |
-| `installUrlPath` | _Route that will be exposed to access the installed catalog item._ |
-| `installHostname` | _tHostname responsible for the installation of the catalog item._ |
-| `installUuid` | _Unique identifier of the installation. Ideal for file and directory suffixes that will be used only by that installed item._ |
-| `installTempDir` | _Temporary directory, usually used to store files and directories that will be temporarily used during the installation and discarded once the process is complete._ |
-| `installRandomPassword` | _Automatically generated password by the system, eliminating the need for manual input._ |
-| `marketplaceCatalogItemAssetsDirPath` | _Assets directory for the catalog item to be installed. Useful for pre-prepared configuration files ready to be used directly during installation._ |
+| Name | Type | Description |
+| -- | -- | -- |
+| `installDirectory` | string | _Path to the directory where all files created by the catalog item installation will be located._ |
+| `installUrlPath` | string | _Route that will be exposed to access the installed catalog item._ |
+| `installHostname` | string | _tHostname responsible for the installation of the catalog item._ |
+| `installUuid` | string | _Unique identifier of the installation. Ideal for file and directory suffixes that will be used only by that installed item._ |
+| `installTempDir` | string | _Temporary directory, usually used to store files and directories that will be temporarily used during the installation and discarded once the process is complete._ |
+| `installRandomPassword` | string | _Automatically generated password by the system, eliminating the need for manual input._ |
+| `marketplaceCatalogItemAssetsDirPath` | string | _Assets directory for the catalog item to be installed. Useful for pre-prepared configuration files ready to be used directly during installation._ |
 
 This substitution also occurs with the data fields added directly in the manifest. The `name` of the data field, when added to a command between `%` as a placeholder, will be replaced by the value of that data field during installation.
