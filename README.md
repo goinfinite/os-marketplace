@@ -11,9 +11,12 @@ Versioning for this repository is managed through branches, which act as release
 git clone --single-branch --branch v0 https://github.com/goinfinite/os-marketplace
 ```
 
+> [!IMPORTANT]
+> The versioning of this repository works differently from the Infinite OS versioning. It is important to understand that the versioning here is done through branches and not releases, and its structure also differs from the Infinite OS. The Infinite OS uses major, minor, and patch versions, whereas this repository uses only a single version level, as all changes have significant impacts on the entire service management.
+
 Below is a mapping of repository versions and the respective Infinite OS versions and `manifestVersion` they support:
 
-| Repository version | Infinite OS version | Manifest version |
+| Repository branch (version) | Infinite OS version | `manifestVersion` |
 | -- | -- | -- |
 | `v0` | [`v0.0.1`](https://github.com/goinfinite/os/releases/tag/v0.0.1) [`v0.0.2`](https://github.com/goinfinite/os/releases/tag/v0.0.2) [`v0.0.4`](https://github.com/goinfinite/os/releases/tag/v0.0.4) [`v0.0.6`](https://github.com/goinfinite/os/releases/tag/v0.0.6) [`v0.0.7`](https://github.com/goinfinite/os/releases/tag/v0.0.7)<br/> [`v0.0.9`](https://github.com/goinfinite/os/releases/tag/v0.0.9) [`v0.1.0`](https://github.com/goinfinite/os/releases/tag/v0.1.0) [`v0.1.2`](https://github.com/goinfinite/os/releases/tag/v0.1.2) [`v0.1.5`](https://github.com/goinfinite/os/releases/tag/v0.1.5) | `v1` |
 
