@@ -23,7 +23,7 @@ Below is a mapping of repository versions and the respective Infinite OS version
 ## Manifest/Schema Properties
 These manifests have their own property structure, which is read by Infinite OS during the management of these catalog items. The supported formats are JSON (`.json`) and YAML (`.yml`, `.yaml`).
 
-[WordPress example](https://github.com/goinfinite/os-marketplace/blob/main/app/wordpress/manifest.json).
+[WordPress example](https://github.com/goinfinite/os-marketplace/blob/v0/app/wordpress/manifest.json).
 
 | Property | Type | Is required? | Description |
 | -- | -- | -- | -- |
