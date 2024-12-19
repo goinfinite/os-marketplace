@@ -55,7 +55,7 @@ uninstallFileNames:
   - php.ini
   - robots.txt
 estimatedSizeBytes: 100000000
-avatarUrl: "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/opencart/assets/avatar.jpg"
+avatarUrl: "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/opencart/assets/avatar.jpg"
 screenshotUrls:
-  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/opencart/assets/screenshot-1.jpg"
-  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/opencart/assets/screenshot-2.jpg"
+  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/opencart/assets/screenshot-1.jpg"
+  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/opencart/assets/screenshot-2.jpg"

@@ -76,11 +76,11 @@
 	  "web.config"
 	],
 	"estimatedSizeBytes": 100000000,
-	"avatarUrl": "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/drupal/assets/avatar.jpg",
+	"avatarUrl": "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/drupal/assets/avatar.jpg",
 	"screenshotUrls": [
-	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/drupal/assets/screenshot-1.jpg",
-	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/drupal/assets/screenshot-2.jpg",
-	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/drupal/assets/screenshot-3.jpg",
-	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/drupal/assets/screenshot-4.jpg"
+	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/drupal/assets/screenshot-1.jpg",
+	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/drupal/assets/screenshot-2.jpg",
+	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/drupal/assets/screenshot-3.jpg",
+	  "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/drupal/assets/screenshot-4.jpg"
 	]
   }

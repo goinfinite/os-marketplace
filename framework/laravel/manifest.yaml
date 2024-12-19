@@ -39,4 +39,4 @@ uninstallFileNames:
   - index.php
   - robots.txt
 estimatedSizeBytes: 55000000
-avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/framework/laravel/assets/avatar.jpg
+avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/framework/laravel/assets/avatar.jpg

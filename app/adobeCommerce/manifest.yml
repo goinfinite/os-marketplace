@@ -831,8 +831,8 @@ uninstallFileNames:
   - "*.sample"
   - composer*
 estimatedSizeBytes: 779091968
-avatarUrl: "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/adobeCommerce/assets/avatar.jpg"
+avatarUrl: "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/adobeCommerce/assets/avatar.jpg"
 screenshotUrls:
-  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/adobeCommerce/assets/screenshot-1.jpg"
-  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/adobeCommerce/assets/screenshot-2.jpg"
-  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/main/app/adobeCommerce/assets/screenshot-3.jpg"
+  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/adobeCommerce/assets/screenshot-1.jpg"
+  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/adobeCommerce/assets/screenshot-2.jpg"
+  - "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v0/app/adobeCommerce/assets/screenshot-3.jpg"
