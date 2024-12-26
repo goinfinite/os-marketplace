@@ -19,11 +19,15 @@ Below is a mapping of repository versions and the respective Infinite OS version
 | Repository branch (version) | Infinite OS version | `manifestVersion` |
 | -- | -- | -- |
 | `v0` | [`v0.0.1`](https://github.com/goinfinite/os/releases/tag/v0.0.1) [`v0.0.2`](https://github.com/goinfinite/os/releases/tag/v0.0.2) [`v0.0.4`](https://github.com/goinfinite/os/releases/tag/v0.0.4) [`v0.0.6`](https://github.com/goinfinite/os/releases/tag/v0.0.6) [`v0.0.7`](https://github.com/goinfinite/os/releases/tag/v0.0.7)<br/> [`v0.0.9`](https://github.com/goinfinite/os/releases/tag/v0.0.9) [`v0.1.0`](https://github.com/goinfinite/os/releases/tag/v0.1.0) [`v0.1.2`](https://github.com/goinfinite/os/releases/tag/v0.1.2) [`v0.1.5`](https://github.com/goinfinite/os/releases/tag/v0.1.5) | `v1` |
+| `v1` | [`v0.1.7`](https://github.com/goinfinite/os/releases/tag/v0.1.7) | `v1` |
+
+> [!NOTE]
+> Branch versioning simplifies the control of manifests and ensures direct compatibility with Infinite OS. Branches allow accessing specific versions without additional steps, such as downloads and manual replacements, as the system uses Git for efficient operations like `git fetch`. [See how it's done](https://github.com/goinfinite/os/blob/main/src/infra/marketplace/marketplaceCmdRepo.go#L765).
 
 ## Manifest/Schema Properties
 These manifests have their own property structure, which is read by Infinite OS during the management of these catalog items. The supported formats are JSON (`.json`) and YAML (`.yml`, `.yaml`).
 
-[WordPress example](https://github.com/goinfinite/os-marketplace/blob/v0/app/wordpress/manifest.json).
+[WordPress example](https://github.com/goinfinite/os-marketplace/blob/v1/app/wordpress/manifest.json).
 
 | Property | Type | Is required? | Description |
 | -- | -- | -- | -- |
