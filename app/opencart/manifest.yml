@@ -18,14 +18,17 @@ dataFields:
   - name: adminUsername
     label: Admin Username
     type: text
+    specificType: username
     isRequired: true
   - name: adminPassword
     label: Admin Password
     type: password
+    specificType: password
     isRequired: true
   - name: adminMailAddress
     label: Admin Email
     type: email
+    specificType: email
     isRequired: true
 installCmdSteps:
   - curl -skL -o %installTempDir%/opencart.zip https://goinfinite.net/assets/os/marketplace/opencart/opencart.zip
