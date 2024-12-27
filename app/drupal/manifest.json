@@ -40,13 +40,13 @@
     "curl -skL -o /app/composer-setup.php https://getcomposer.org/installer",
     "php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer",
     "rm -rf /app/composer-setup.php",
-    "os runtime php update -n %installHostname% -v 8.3 -m sqlite3:true -m pdo_sqlite:true",
+    "os runtime php update -n '%installHostname%' -v 8.3 -m sqlite3:true -m pdo_sqlite:true",
     "os db create -n drupalDb_%installUuid% -t mysql",
-    "os db create-user -n drupalDb_%installUuid% -t mysql -u drupalUser_%installUuid% -p %installRandomPassword% -r all",
+    "os db create-user -n 'drupalDb_%installUuid%' -t mysql -u 'drupalUser_%installUuid%' -p '%installRandomPassword%' -r all",
     "mkdir -p /app/drupal-%installHostname%-%installUuid%/",
-    "COMPOSER_ALLOW_SUPERUSER=1 composer create-project drupal/recommended-project /app/drupal-%installHostname%-%installUuid%/ -q -n --no-dev",
+    "COMPOSER_ALLOW_SUPERUSER=1 composer create-project drupal/recommended-project '/app/drupal-%installHostname%-%installUuid%/' -q -n --no-dev",
     "cd /app/drupal-%installHostname%-%installUuid%/; composer require drush/drush",
-    "cd /app/drupal-%installHostname%-%installUuid%/; vendor/bin/drush site:install standard --db-url=mysql://drupalUser_%installUuid%:%installRandomPassword%@localhost/drupalDb_%installUuid% --account-name=%adminUsername% --account-pass=%adminPassword% --account-mail=%adminMailAddress% -y",
+    "cd /app/drupal-%installHostname%-%installUuid%/; vendor/bin/drush site:install standard --db-url='mysql://drupalUser_%installUuid%:%installRandomPassword%@localhost/drupalDb_%installUuid%' --account-name='%adminUsername%' --account-pass='%adminPassword%' --account-mail='%adminMailAddress%' -y",
     "find %installDirectory% -mindepth 1 -maxdepth 1 -exec mv -t %installTempDir% {} +",
     "rm -rf %installDirectory%",
     "ln -s /app/drupal-%installHostname%-%installUuid%/web/ %installDirectory%",
@@ -55,8 +55,8 @@
     "chown -R nobody:nogroup -L /app/drupal-%installHostname%-%installUuid%/"
   ],
   "uninstallCmdSteps": [
-    "os db delete-user -n drupalDb_%installUuid% -t mysql -u drupalUser_%installUuid%",
-    "os db delete -n drupalDb_%installUuid% -t mysql"
+    "os db delete-user -n 'drupalDb_%installUuid%' -t mysql -u 'drupalUser_%installUuid%'",
+    "os db delete -n 'drupalDb_%installUuid%' -t mysql"
   ],
   "uninstallFileNames": [
     "core",

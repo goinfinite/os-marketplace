@@ -785,8 +785,8 @@
     "curl -skL -o /app/composer-setup.php https://getcomposer.org/installer",
     "php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer",
     "rm -rf /app/composer-setup.php",
-    "os runtime php update -n %installHostname% -v 8.2",
-    "os vhost mapping create -n %installHostname% -p %installUrlPath% -t service -v php >/dev/null 2>&1 || true",
+    "os runtime php update -n '%installHostname%' -v 8.2",
+    "os vhost mapping create -n '%installHostname%' -p '%installUrlPath%' -t service -v php >/dev/null 2>&1 || true",
     "composer init --name=openmage/openmage -d %installDirectory% -n -q",
     "composer config --json extra.enable-patching true -f %installDirectory%/composer.json -q",
     "composer config extra.magento-core-package-type magento-source -f %installDirectory%/composer.json -q",
@@ -797,13 +797,13 @@
     "composer require \"aydin-hassan/magento-core-composer-installer\":\"^2.1.0\" -d %installDirectory% -q",
     "composer require \"openmage/magento-lts\":\"^20.0.0\" -d %installDirectory% -q",
     "cd %installDirectory%; composer dump-autoload --optimize ",
-    "os db create -n omDb_%installUuid% -t mysql",
-    "os db create-user -n omDb_%installUuid% -t mysql -u omUser_%installUuid% -p %installRandomPassword% -r all",
-    "php %installDirectory%/install.php --license_agreement_accepted yes --locale %locale% --timezone %timezone% --default_currency %currency% --db_host localhost --db_name omDb_%installUuid% --db_user omUser_%installUuid% --db_pass %installRandomPassword% --url http://%installHostname%%installUrlPath% --use_rewrites no --use_secure yes --secure_base_url https://%installHostname%%installUrlPath% --use_secure_admin yes --admin_lastname %adminLastName% --admin_firstname %adminFirstName% --admin_email %adminMailAddress% --admin_username %adminUsername% --admin_password %adminPassword%"
+    "os db create -n 'omDb_%installUuid%' -t mysql",
+    "os db create-user -n 'omDb_%installUuid%' -t mysql -u 'omUser_%installUuid%' -p '%installRandomPassword%' -r all",
+    "php %installDirectory%/install.php --license_agreement_accepted yes --locale '%locale%' --timezone '%timezone%' --default_currency '%currency%' --db_host localhost --db_name 'omDb_%installUuid%' --db_user 'omUser_%installUuid%' --db_pass '%installRandomPassword%' --url 'http://%installHostname%%installUrlPath%' --use_rewrites no --use_secure yes --secure_base_url 'https://%installHostname%%installUrlPath%' --use_secure_admin yes --admin_lastname '%adminLastName%' --admin_firstname '%adminFirstName%' --admin_email '%adminMailAddress%' --admin_username '%adminUsername%' --admin_password '%adminPassword%'"
   ],
   "uninstallCmdSteps": [
-    "os db delete-user -n omDb_%installUuid% -t mysql -u omUser_%installUuid%",
-    "os db delete -n omDb_%installUuid% -t mysql"
+    "os db delete-user -n 'omDb_%installUuid%' -t mysql -u 'omUser_%installUuid%'",
+    "os db delete -n 'omDb_%installUuid%' -t mysql"
   ],
   "uninstallFileNames": [
     "app",
