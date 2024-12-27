@@ -4,7 +4,7 @@
   "name": "Drupal",
   "type": "app",
   "description": "Drupal is an open source platform for building amazing digital experiences. It's made by a dedicated community. Anyone can use it, and it will always be free.",
-  "services": ["php:8.2", "mariadb:10.6"],
+  "services": ["php:8.3", "mariadb:10.6"],
   "mappings": [
     {
       "path": "/",
@@ -40,7 +40,7 @@
     "curl -skL -o /app/composer-setup.php https://getcomposer.org/installer",
     "php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer",
     "rm -rf /app/composer-setup.php",
-    "os runtime php update -n %installHostname% -v 8.2 -m sqlite3:true -m pdo_sqlite:true",
+    "os runtime php update -n %installHostname% -v 8.3 -m sqlite3:true -m pdo_sqlite:true",
     "os db create -n drupalDb_%installUuid% -t mysql",
     "os db create-user -n drupalDb_%installUuid% -t mysql -u drupalUser_%installUuid% -p %installRandomPassword% -r all",
     "mkdir -p /app/drupal-%installHostname%-%installUuid%/",
