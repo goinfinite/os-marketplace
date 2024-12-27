@@ -70,3 +70,6 @@ Below is a table of all available system data fields for creating manifests:
 | `marketplaceCatalogItemAssetsDirPath` | string | _Assets directory for the catalog item to be installed. Useful for pre-prepared configuration files ready to be used directly during installation._ |
 
 This substitution also occurs with the data fields added directly in the manifest. The `name` of the data field, when added to a command between `%` as a placeholder, will be replaced by the value of that data field during installation.
+
+> [!IMPORTANT]
+> System data field auto-generated values must be escaped within the manifest itself. Infinite OS won't append any character to the auto-generated values.
