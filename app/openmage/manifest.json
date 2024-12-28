@@ -793,6 +793,7 @@
     "composer config extra.magento-root-dir %installDirectory% -f %installDirectory%/composer.json -q",
     "composer config --no-plugins allow-plugins.aydin-hassan/magento-core-composer-installer true -f %installDirectory%/composer.json -q",
     "composer config --no-plugins allow-plugins.magento-hackathon/magento-composer-installer true -f %installDirectory%/composer.json -q",
+    "composer config --no-plugins allow-plugins.openmage/composer-plugin true -f %installDirectory%/composer.json -q",
     "composer config --no-plugins allow-plugins.cweagans/composer-patches true -f %installDirectory%/composer.json -q",
     "composer require \"aydin-hassan/magento-core-composer-installer\":\"^2.1.0\" -d %installDirectory% -q",
     "composer require \"openmage/magento-lts\":\"^20.0.0\" -d %installDirectory% -q",
