@@ -786,7 +786,7 @@ dataFields:
     type: text
     isRequired: true
 installCmdSteps:
-  - if [[ $(echo -n \"%adminPassword%\" | wc -m) -lt 16 ]]; then echo -n AdminPasswordTooShort >&2; exit 1; fi
+  - if [[ $(echo -n '%adminPassword%' | wc -m) -lt 16 ]]; then echo -n AdminPasswordTooShort >&2; exit 1; fi
   - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
   - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer
   - rm -rf /app/composer-setup.php
@@ -802,7 +802,7 @@ installCmdSteps:
   - os db create-user -n 'acDb_%installUuid%' -t mysql -u 'acUser_%installUuid%' -p '%installRandomPassword%' -r all
   - "sed -i '/^# WARNING: revise all the lines below before you go into production/,/^node.max_local_storage_nodes/{//!d;}' /etc/opensearch/opensearch.yml"
   - sed -i '/^plugins.security.*/d' /etc/opensearch/opensearch.yml
-  - 'echo "plugins.security.disabled: true" >> /etc/opensearch/opensearch.yml'
+  - echo 'plugins.security.disabled: true' >> /etc/opensearch/opensearch.yml
   - os services update -n opensearch -s restart
   - sed -i "s|memory_limit.*|memory_limit = 1G|g" /usr/local/lsws/lsphp82/etc/php/8.2/litespeed/php.ini
   - sed -i "s|;realpath_cache_size.*|realpath_cache_size = 10M|g" /usr/local/lsws/lsphp82/etc/php/8.2/litespeed/php.ini
@@ -810,7 +810,7 @@ installCmdSteps:
   - os services update -n php -s restart
   - sleep 3; %installDirectory%/bin/magento setup:install --base-url='http://%installHostname%%installUrlPath%' --use-secure=1 --base-url-secure='https://%installHostname%%installUrlPath%' --use-secure-admin=1 --db-host=localhost --db-name='acDb_%installUuid%' --db-user='acUser_%installUuid%' --db-password='%installRandomPassword%' --admin-firstname='%adminFirstName%' --admin-lastname='%adminLastName%' --admin-email='%adminMailAddress%' --admin-user='%adminUsername%' --admin-password='%adminPassword%' --language='%locale%' --currency='%currency%' --timezone='%timezone%' --search-engine=opensearch --opensearch-host=localhost --opensearch-port=9200 --opensearch-index-prefix='acIndex_%installUuid%' --opensearch-timeout=15 -q -n
   - chmod u-w %installDirectory%/app/etc
-  - if [[ "%installUrlPath%" != "/" ]]; then sed -i "s|/pub/\$0|%installUrlPath%/pub/\$0|g" %installDirectory%/.htaccess; fi
+  - if [[ '%installUrlPath%' != '/' ]]; then sed -i 's|/pub/\$0|%installUrlPath%/pub/\$0|g' %installDirectory%/.htaccess; fi
 uninstallCmdSteps:
   - os db delete-user -n 'acDb_%installUuid%' -t mysql -u 'acUser_%installUuid%'
   - os db delete -n 'acDb_%installUuid%' -t mysql
