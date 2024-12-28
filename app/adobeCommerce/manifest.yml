@@ -802,7 +802,7 @@ installCmdSteps:
   - os db create-user -n 'acDb_%installUuid%' -t mysql -u 'acUser_%installUuid%' -p '%installRandomPassword%' -r all
   - "sed -i '/^# WARNING: revise all the lines below before you go into production/,/^node.max_local_storage_nodes/{//!d;}' /etc/opensearch/opensearch.yml"
   - sed -i '/^plugins.security.*/d' /etc/opensearch/opensearch.yml
-  - echo 'plugins.security.disabled: true' >> /etc/opensearch/opensearch.yml
+  - 'echo "plugins.security.disabled: true" >> /etc/opensearch/opensearch.yml'
   - os services update -n opensearch -s restart
   - sed -i "s|memory_limit.*|memory_limit = 1G|g" /usr/local/lsws/lsphp82/etc/php/8.2/litespeed/php.ini
   - sed -i "s|;realpath_cache_size.*|realpath_cache_size = 10M|g" /usr/local/lsws/lsphp82/etc/php/8.2/litespeed/php.ini
