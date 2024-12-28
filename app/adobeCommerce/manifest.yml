@@ -791,7 +791,7 @@ installCmdSteps:
   - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer
   - rm -rf /app/composer-setup.php
   - os runtime php update -n '%installHostname%' -v 8.2
-  - composer config --global http-basic.repo.magento.com '%adobeCommerceMarketplacePublicKey%' '%adobeCommerceMarketplacePrivateKey%' -q
+  - composer config --global http-basic.repo.magento.com '%adobeCommercePublicKey%' '%adobeCommercePrivateKey%' -q
   - composer create-project --repository-url=https://repo.magento.com/ 'magento/project-%edition%-edition' %installDirectory% -n -q --no-dev
   - composer config --global http-basic.repo.magento.com "" "" -q
   - chown -R nobody:nogroup %installDirectory%
