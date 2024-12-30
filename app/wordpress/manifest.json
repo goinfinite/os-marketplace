@@ -42,6 +42,12 @@
       "type": "email",
       "specificType": "email",
       "isRequired": true
+    },
+    {
+      "name": "adminTitle",
+      "label": "Site Title",
+      "type": "text",
+      "defaultValue": "My WordPress Site"
     }
   ],
   "installCmdSteps": [
@@ -53,9 +59,8 @@
     "os db create -n 'wpDb_%installUuid%' -t mysql",
     "os db create-user -n 'wpDb_%installUuid%' -t mysql -u 'wpUser_%installUuid%' -p '%installRandomPassword%' -r all",
     "wp config create --path='%installDirectory%' --dbname='wpDb_%installUuid%' --dbuser='wpUser_%installUuid%' --dbpass='%installRandomPassword%' --allow-root",
-    "wp core install --path='%installDirectory%' --locale='%locale%' --url='%installHostname%' --title='%adminTitle%' --admin_user='%adminUsername%' --admin_password='%adminPassword%' --admin_email='%adminMailAddress%' --allow-root",
-    "cp -u '%marketplaceCatalogItemAssetsDirPath%/htaccess.txt' '%installDirectory%/.htaccess'",
-    "wp rewrite structure '/%postname%' --path='%installDirectory%' --allow-root"
+    "php -d memory_limit=384M \"$(which wp)\" core install --path='%installDirectory%' --locale='%locale%' --url='%installHostname%' --title='%adminTitle%' --admin_user='%adminUsername%' --admin_password='%adminPassword%' --admin_email='%adminMailAddress%' --allow-root",
+    "cp -u '%marketplaceCatalogItemAssetsDirPath%/htaccess.txt' '%installDirectory%/.htaccess'"
   ],
   "uninstallCmdSteps": [
     "os db delete-user -n 'wpDb_%installUuid%' -t mysql -u 'wpUser_%installUuid%'",
