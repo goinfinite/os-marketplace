@@ -85,3 +85,8 @@ This substitution also occurs with the data fields added directly in the manifes
 
 > [!IMPORTANT]
 > System data field auto-generated values must be escaped within the manifest itself. Infinite OS won't append any character to the auto-generated values.
+
+## Avatars
+
+The avatars are images that represent the catalog item in the Infinite OS marketplace. They are used for illustration purposes and are displayed in the marketplace interface.
+We recommend using [Pixlr Express](https://pixlr.com/express/) to create or edit images for the marketplace. The file should be named `avatar.jpg` and have a resolution of 720x720 pixels.
