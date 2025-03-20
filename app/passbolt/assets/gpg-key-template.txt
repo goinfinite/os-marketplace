@@ -1,0 +1,8 @@
+Key-Type: default
+Key-Length: 3072
+Subkey-Type: default
+Subkey-Length: 3072
+Name-Real: name_real
+Name-Email: name_email
+Expire-Date: 0
+%no-protection
