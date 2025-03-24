@@ -55,10 +55,10 @@
     "chmod +x /app/wp-cli.phar",
     "mv /app/wp-cli.phar /usr/local/bin/wp",
     "os runtime php update -n '%installHostname%' -v 8.2",
-    "wp core download --path='%installDirectory%' --locale='%locale%' --allow-root",
+    "php -d memory_limit=384M \"$(which wp)\" core download --path='%installDirectory%' --locale='%locale%' --allow-root",
     "os db create -n 'wpDb_%installUuid%' -t mysql",
     "os db create-user -n 'wpDb_%installUuid%' -t mysql -u 'wpUser_%installUuid%' -p '%installRandomPassword%' -r all",
-    "wp config create --path='%installDirectory%' --dbname='wpDb_%installUuid%' --dbuser='wpUser_%installUuid%' --dbpass='%installRandomPassword%' --allow-root",
+    "php -d memory_limit=384M \"$(which wp)\" config create --path='%installDirectory%' --dbname='wpDb_%installUuid%' --dbuser='wpUser_%installUuid%' --dbpass='%installRandomPassword%' --allow-root",
     "php -d memory_limit=384M \"$(which wp)\" core install --path='%installDirectory%' --locale='%locale%' --url='%installHostname%' --title='%adminTitle%' --admin_user='%adminUsername%' --admin_password='%adminPassword%' --admin_email='%adminMailAddress%' --allow-root",
     "cp -u '%marketplaceCatalogItemAssetsDirPath%/htaccess.txt' '%installDirectory%/.htaccess'"
   ],
