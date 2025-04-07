@@ -49,7 +49,7 @@ installCmdSteps:
   - os vhost mapping create --hostname %installHostname% --path %installUrlPath% --type service --value php
   - sleep 120 && chown -Rc nobody:nogroup /app/%installHostname%-moodledata/
 uninstallCmdSteps:
-  - mkdir -p /app/.trash/moodle-%installHostname%-%installUuid% && shopt -s dotglob && mv /app/html/* /app/.trash/moodle-%installHostname%-%installUuid%/ && shopt -u dotglob
+  - mkdir -p /app/.trash/moodle-%installHostname%-%installUuid% && shopt -s dotglob && mv %installDirectory%/* /app/.trash/moodle-%installHostname%-%installUuid%/ && shopt -u dotglob
   - install_packages -qq jq
   - mappingId=$(os vhost mapping get | jq '.body[] | select(.hostname == "%installHostname%") | .mappings[] | select(.path == "%installUrlPath%") | .id') && os vhost mapping delete --id ${mappingId}
   - os db delete-user --db-type mysql --db-name 'moodle_%installUuid%' --db-username 'moodle_%installUuid%'
