@@ -3,7 +3,7 @@ slugs:
   - moodle
 name: Moodle
 type: app
-description: Moodle is the world's most customisable and trusted eLearning solution that empowers educators to improve our world.
+description: Moodle is an open-source online learning platform, built in PHP, designed for creating and managing virtual learning environments.
 services:
   - mariadb
   - php:8.3
