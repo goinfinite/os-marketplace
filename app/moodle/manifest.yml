@@ -7,6 +7,11 @@ description: Moodle is an open-source online learning platform, built in PHP, de
 services:
   - mariadb
   - php:8.3
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: php
 dataFields:
   - name: adminUsername
     label: Admin Username
@@ -46,17 +51,13 @@ installCmdSteps:
   - php -d max_input_vars=5000 %installDirectory%/admin/cli/install.php --chmod=755 --wwwroot=https://%installHostname% --dataroot=/app/%installHostname%-moodledata --dbtype=mariadb --dbname=moodle_%installUuid% --dbuser=moodle_%installUuid% --dbpass='%installRandomPassword%' --dbport=3306 --fullname='%fullName%' --shortname='%shortName%' --adminuser='%adminUsername%' --adminpass='%adminPassword%' --adminemail=%adminEmail% --non-interactive --agree-license
   - echo -e '\n$CFG->routerconfigured = true;\n' >>%installDirectory%/config.php
   - os cron create -s "* * * * *" -d "MoodleCron" -c "php %installDirectory%/admin/cli/cron.php"
-  - os vhost mapping create --hostname %installHostname% --path %installUrlPath% --type service --value php
   - sleep 120 && chown -Rc nobody:nogroup /app/%installHostname%-moodledata/
 uninstallCmdSteps:
   - mkdir -p /app/.trash/moodle-%installHostname%-%installUuid%
   - shopt -s dotglob && mv %installDirectory%/* /app/%installHostname%-moodledata/ /app/.trash/moodle-%installHostname%-%installUuid%/ && shopt -u dotglob
-  - install_packages -qq jq
-  - mappingId=$(os vhost mapping get | jq '.body.virtualHostWithMappings[] | select(.hostname == "%installHostname%") | .mappings[] | select(.path == "%installUrlPath%") | .id') && os vhost mapping delete --id ${mappingId}
   - os db delete-user --db-type mysql --db-name 'moodle_%installUuid%' --db-username 'moodle_%installUuid%'
   - os db delete --db-type mysql --db-name 'moodle_%installUuid%'
   - os cron delete -d "MoodleCron"
-  - apt -qqy remove jq && apt -qqy autoremove
 installTimeoutSecs: 900
 estimatedSizeBytes: 372349285
 avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/moodle/assets/avatar.png
