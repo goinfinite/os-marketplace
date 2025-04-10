@@ -46,18 +46,18 @@ installCmdSteps:
   - os runtime php update-setting --hostname %installHostname% --version 8.3 --name max_input_vars --value 7200
   - sed -i 's/uca1400_ai_ci/general_ci/' /etc/mysql/mariadb.conf.d/50-server.cnf
   - os services update --name mariadb --status restart
-  - os db create --db-type mysql --db-name 'moodle_%installUuid%'
-  - os db create-user --db-type mysql --db-name 'moodle_%installUuid%' --username 'moodle_%installUuid%' --password '%installRandomPassword%' --privileges all
-  - php -d max_input_vars=5000 %installDirectory%/admin/cli/install.php --chmod=755 --wwwroot=https://%installHostname% --dataroot=/app/%installHostname%-moodledata --dbtype=mariadb --dbname=moodle_%installUuid% --dbuser=moodle_%installUuid% --dbpass='%installRandomPassword%' --dbport=3306 --fullname='%fullName%' --shortname='%shortName%' --adminuser='%adminUsername%' --adminpass='%adminPassword%' --adminemail=%adminEmail% --non-interactive --agree-license
+  - os db create --db-type mysql --db-name moodle_%installUuid%
+  - os db create-user --db-type mysql --db-name moodle_%installUuid% --username moodle_%installUuid% --password '%installRandomPassword%' --privileges all
+  - php -d max_input_vars=5000 %installDirectory%/admin/cli/install.php --chmod=755 --wwwroot='https://%installHostname%%installUrlPath%' --dataroot='/app/%installHostname%-moodledata' --dbtype=mariadb --dbname=moodle_%installUuid% --dbuser=moodle_%installUuid% --dbpass='%installRandomPassword%' --dbport=3306 --fullname='%fullName%' --shortname='%shortName%' --adminuser='%adminUsername%' --adminpass='%adminPassword%' --adminemail='%adminEmail%' --non-interactive --agree-license
   - echo -e '\n$CFG->routerconfigured = true;\n' >>%installDirectory%/config.php
-  - os cron create -s "* * * * *" -d "MoodleCron" -c "php %installDirectory%/admin/cli/cron.php"
+  - os cron create -s '* * * * *' -d 'MoodleCron' -c 'php %installDirectory%/admin/cli/cron.php'
   - sleep 120 && chown -Rc nobody:nogroup /app/%installHostname%-moodledata/
 uninstallCmdSteps:
   - mkdir -p /app/.trash/moodle-%installHostname%-%installUuid%
   - shopt -s dotglob && mv %installDirectory%/* /app/%installHostname%-moodledata/ /app/.trash/moodle-%installHostname%-%installUuid%/ && shopt -u dotglob
-  - os db delete-user --db-type mysql --db-name 'moodle_%installUuid%' --db-username 'moodle_%installUuid%'
-  - os db delete --db-type mysql --db-name 'moodle_%installUuid%'
-  - os cron delete -d "MoodleCron"
+  - os db delete-user --db-type mysql --db-name moodle_%installUuid% --db-username moodle_%installUuid%
+  - os db delete --db-type mysql --db-name moodle_%installUuid%
+  - os cron delete -d 'MoodleCron'
 installTimeoutSecs: 900
 estimatedSizeBytes: 372349285
 avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/moodle/assets/avatar.png
