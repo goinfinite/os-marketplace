@@ -31,10 +31,12 @@ dataFields:
   - name: siteFullName
     label: Site Full Name
     type: text
+    defaultValue: Moodle Learning Platform
     isRequired: true
   - name: siteShortName
     label: Site Short Name
     type: text
+    defaultValue: Moodle
     isRequired: true
 installCmdSteps:
   - cp -u %marketplaceCatalogItemAssetsDirPath%/.htaccess %installDirectory%/
