@@ -28,11 +28,11 @@ dataFields:
     type: email
     specificType: email
     isRequired: true
-  - name: fullName
+  - name: siteFullName
     label: Site Full Name
     type: text
     isRequired: true
-  - name: shortName
+  - name: siteShortName
     label: Site Short Name
     type: text
     isRequired: true
@@ -48,7 +48,7 @@ installCmdSteps:
   - os services update --name mariadb --status restart
   - os db create --db-type mysql --db-name moodle_%installUuid%
   - os db create-user --db-type mysql --db-name moodle_%installUuid% --username moodle_%installUuid% --password '%installRandomPassword%' --privileges all
-  - php -d max_input_vars=5000 %installDirectory%/admin/cli/install.php --chmod=755 --wwwroot='https://%installHostname%%installUrlPath%' --dataroot='/app/%installHostname%-moodledata' --dbtype=mariadb --dbname=moodle_%installUuid% --dbuser=moodle_%installUuid% --dbpass='%installRandomPassword%' --dbport=3306 --fullname='%fullName%' --shortname='%shortName%' --adminuser='%adminUsername%' --adminpass='%adminPassword%' --adminemail='%adminEmail%' --non-interactive --agree-license
+  - php -d max_input_vars=5000 %installDirectory%/admin/cli/install.php --chmod=755 --wwwroot='https://%installHostname%%installUrlPath%' --dataroot='/app/%installHostname%-moodledata' --dbtype=mariadb --dbname=moodle_%installUuid% --dbuser=moodle_%installUuid% --dbpass='%installRandomPassword%' --dbport=3306 --fullname='%siteFullName%' --shortname='%siteShortName%' --adminuser='%adminUsername%' --adminpass='%adminPassword%' --adminemail='%adminEmail%' --non-interactive --agree-license
   - echo -e '\n$CFG->routerconfigured = true;\n' >>%installDirectory%/config.php
   - os cron create -s '* * * * *' -d 'MoodleCron' -c 'php %installDirectory%/admin/cli/cron.php'
   - sleep 120 && chown -Rc nobody:nogroup /app/%installHostname%-moodledata/
