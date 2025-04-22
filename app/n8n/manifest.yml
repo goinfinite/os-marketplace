@@ -8,7 +8,7 @@ description: n8n is a workflow automation platform that gives technical teams th
 installCmdSteps:
   - install_packages -qq jq
   - cp -u %marketplaceCatalogItemAssetsDirPath%/env.txt %installDirectory%/.env
-  - sed -i 's|n8n_editor_base_url|%installHostname%|' %installDirectory%/.env
+  - sed -i 's|n8n_base_url|%installHostname%|' %installDirectory%/.env
   - sed -i 's|n8n_user_folder|%installDirectory%|' %installDirectory%/.env
   - cd %installDirectory% && mise x node@20 -- npm install n8n@latest
   - os services create-installable --name node --port-bindings 5678/ws --version 20 --auto-create-mapping true --auto-start true --auto-restart true --startup-file %installDirectory%/node_modules/.bin/n8n --working-dir %installDirectory%
