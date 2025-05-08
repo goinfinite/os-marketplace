@@ -60,8 +60,8 @@ uninstallCmdSteps:
   - os cron delete -d 'MoodleCron'
 installTimeoutSecs: 900
 estimatedSizeBytes: 372349285
-avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/moodle/assets/avatar.png
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/moodle/assets/avatar.png
 screenshotUrls:
-  - https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/moodle/assets/screenshot-1.png
-  - https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/moodle/assets/screenshot-2.png
-  - https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/moodle/assets/screenshot-3.png
+  - https://goinfinite.github.io/os-marketplace/app/moodle/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/moodle/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/moodle/assets/screenshot-3.png
