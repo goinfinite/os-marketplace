@@ -31,8 +31,8 @@ uninstallFileNames:
   - package-lock.json
 installTimeoutSecs: 900
 estimatedSizeBytes: 828403472
-avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/n8n/assets/avatar.jpg
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/n8n/assets/avatar.jpg
 screenshotUrls:
-  - https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/n8n/assets/screenshot-1.jpg
-  - https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/n8n/assets/screenshot-2.jpg
-  - https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/n8n/assets/screenshot-3.jpg
+  - https://goinfinite.github.io/os-marketplace/app/n8n/assets/screenshot-1.jpg
+  - https://goinfinite.github.io/os-marketplace/app/n8n/assets/screenshot-2.jpg
+  - https://goinfinite.github.io/os-marketplace/app/n8n/assets/screenshot-3.jpg

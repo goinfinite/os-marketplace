@@ -827,10 +827,10 @@
     "*.sample"
   ],
   "estimatedSizeBytes": 268435456,
-  "avatarUrl": "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/openmage/assets/avatar.jpg",
+  "avatarUrl": "https://goinfinite.github.io/os-marketplace/app/openmage/assets/avatar.jpg",
   "screenshotUrls": [
-    "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/openmage/assets/screenshot-1.jpg",
-    "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/openmage/assets/screenshot-2.jpg",
-    "https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/openmage/assets/screenshot-3.jpg"
+    "https://goinfinite.github.io/os-marketplace/app/openmage/assets/screenshot-1.jpg",
+    "https://goinfinite.github.io/os-marketplace/app/openmage/assets/screenshot-2.jpg",
+    "https://goinfinite.github.io/os-marketplace/app/openmage/assets/screenshot-3.jpg"
   ]
 }
