@@ -92,4 +92,4 @@ uninstallCmdSteps:
 uninstallFileNames:
   - package-lock.json
 estimatedSizeBytes: 225409823
-avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/app/passbolt/assets/avatar.jpg
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/passbolt/assets/avatar.jpg
