@@ -14,4 +14,4 @@ mappings:
     targetType: service
     targetValue: php
 estimatedSizeBytes: 2000000000
-avatarUrl: https://raw.githubusercontent.com/goinfinite/os-marketplace/refs/heads/v1/stack/lamp/assets/avatar.jpg
+avatarUrl: https://goinfinite.github.io/os-marketplace/stack/lamp/assets/avatar.jpg

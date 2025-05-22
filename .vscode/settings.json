@@ -1,0 +1,23 @@
+{
+  "cSpell.words": [
+    "adminemail",
+    "adminpass",
+    "adminuser",
+    "dataroot",
+    "dbname",
+    "dbpass",
+    "dbport",
+    "dbtype",
+    "dbuser",
+    "dotglob",
+    "mariadb",
+    "moodle",
+    "moodledata",
+    "mysql",
+    "nogroup",
+    "routerconfigured",
+    "shopt",
+    "Uuid",
+    "wwwroot"
+  ]
+}

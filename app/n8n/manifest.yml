@@ -1,0 +1,38 @@
+manifestVersion: v1
+slugs:
+  - n8n
+  - n8n-io
+name: n8n
+type: app
+description: n8n is a workflow automation platform that gives technical teams the flexibility of code with the speed of no-code. With 400+ integrations, native AI capabilities, and a fair-code license, n8n lets you build powerful automations while maintaining full control over your data and deployments.
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: node
+installCmdSteps:
+  - install_packages -qq jq
+  - cp -u %marketplaceCatalogItemAssetsDirPath%/env.txt %installDirectory%/.env
+  - sed -i 's|n8n_base_url|%installHostname%|g' %installDirectory%/.env
+  - sed -i 's|n8n_user_folder|%installDirectory%|' %installDirectory%/.env
+  - cd %installDirectory% && mise x node@20 -- npm install n8n@latest
+  - os services create-installable --name node --port-bindings 5678/ws --version 20 --auto-create-mapping false --auto-start true --auto-restart true --startup-file %installDirectory%/node_modules/.bin/n8n --working-dir %installDirectory%
+uninstallCmdSteps:
+  - cd %installDirectory% && mise x node@20 -- npm uninstall n8n
+  - mv %installDirectory%/.n8n /app/.trash/.n8n-$(date +%s)
+  - os services get | jq -r '.body.installedServices[]|select(.startCmd|contains("%installDirectory%/node_modules/.bin/n8n"))|.name' | xargs --no-run-if-empty os services delete --name
+  - rm -fr /root/.npm/
+  - apt -qqy remove jq && apt -qqy autoremove
+uninstallFileNames:
+  - .cache
+  - .env
+  - node_modules
+  - package.json
+  - package-lock.json
+installTimeoutSecs: 900
+estimatedSizeBytes: 828403472
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/n8n/assets/avatar.jpg
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/n8n/assets/screenshot-1.jpg
+  - https://goinfinite.github.io/os-marketplace/app/n8n/assets/screenshot-2.jpg
+  - https://goinfinite.github.io/os-marketplace/app/n8n/assets/screenshot-3.jpg
