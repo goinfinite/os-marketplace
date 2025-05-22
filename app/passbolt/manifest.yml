@@ -7,6 +7,11 @@ description: Passbolt is an open source credential platform for modern teams. A 
 services:
   - php:8.3
   - mariadb
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: php
 dataFields:
   - name: adminFirstName
     label: Admin First Name
@@ -44,7 +49,6 @@ dataFields:
     type: password
     isRequired: true
 installCmdSteps:
-  - os vhost mapping create --hostname %installHostname% --path %installUrlPath% --type service --value php-webserver
   - install_packages libgpgme-dev
   - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
   - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
@@ -83,12 +87,9 @@ installCmdSteps:
   - os cron create -s "* * * * *" -d "PassboltCron" -c "su nobody --shell /bin/bash -c 'bash %installDirectory%/bin/cake EmailQueue.sender'"
   - os services update --name php --status restart
 uninstallCmdSteps:
-  - install_packages -qq jq
-  - mappingId=$(os vhost mapping get | jq '.body[] | select(.hostname == "%installHostname%") | .mappings[] | select(.path == "%installUrlPath%") | .id') && os vhost mapping delete --id ${mappingId}
   - os db delete-user --db-type mysql --db-name 'passbolt_%installUuid%' --db-username 'passbolt_%installUuid%'
   - os db delete --db-type mysql --db-name 'passbolt_%installUuid%'
   - os cron delete -d "PassboltCron"
-  - apt -qqy remove jq && apt -qqy autoremove
 uninstallFileNames:
   - package-lock.json
 estimatedSizeBytes: 225409823
