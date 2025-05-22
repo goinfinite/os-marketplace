@@ -48,13 +48,13 @@ installCmdSteps:
   - install_packages libgpgme-dev
   - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
   - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
-  - /infinite/os runtime php update --hostname %installHostname% --version 8.3
-  - for extension in ldap pear; do /infinite/os runtime php update-module --hostname %installHostname% --name ${extension} --status true --version 8.3; done
+  - os runtime php update --hostname %installHostname% --version 8.3
+  - for extension in ldap pear; do os runtime php update-module --hostname %installHostname% --name ${extension} --status true --version 8.3; done
   - if [[ ! -f /usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini ]]; then /usr/local/lsws/lsphp83/bin/pecl install gnupg; fi
   - echo "extension=gnupg.so" >>/usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini
-  - /infinite/os services update --name php --status restart
-  - /infinite/os db create --db-type mysql --db-name 'passbolt_%installUuid%'
-  - /infinite/os db create-user --db-type mysql --db-name 'passbolt_%installUuid%' --username 'passbolt_%installUuid%' --password '%installRandomPassword%' --privileges all
+  - os services update --name php --status restart
+  - os db create --db-type mysql --db-name 'passbolt_%installUuid%'
+  - os db create-user --db-type mysql --db-name 'passbolt_%installUuid%' --username 'passbolt_%installUuid%' --password '%installRandomPassword%' --privileges all
   - usermod -d %installDirectory% nobody
   - git config --global --add safe.directory %installDirectory%
   - git clone https://github.com/passbolt/passbolt_api.git %installDirectory%
@@ -80,14 +80,14 @@ installCmdSteps:
   - su nobody --shell /bin/bash -c "bash %installDirectory%/bin/cake passbolt create_jwt_keys --quiet"
   - chmod 500 %installDirectory%/config/jwt/
   - su nobody --shell /bin/bash -c "bash %installDirectory%/bin/cake passbolt install --admin-first-name %adminFirstName% --admin-last-name %adminLastName% --admin-username %adminMailAddress%" 2>/dev/null
-  - /infinite/os cron create -s "* * * * *" -d "PassboltCron" -c "su nobody --shell /bin/bash -c 'bash %installDirectory%/bin/cake EmailQueue.sender'"
-  - /infinite/os services update --name php --status restart
+  - os cron create -s "* * * * *" -d "PassboltCron" -c "su nobody --shell /bin/bash -c 'bash %installDirectory%/bin/cake EmailQueue.sender'"
+  - os services update --name php --status restart
 uninstallCmdSteps:
   - install_packages -qq jq
-  - mappingId=$(/infinite/os vhost mapping get | jq '.body[] | select(.hostname == "%installHostname%") | .mappings[] | select(.path == "%installUrlPath%") | .id') && os vhost mapping delete --id ${mappingId}
-  - /infinite/os db delete-user --db-type mysql --db-name 'passbolt_%installUuid%' --db-username 'passbolt_%installUuid%'
-  - /infinite/os db delete --db-type mysql --db-name 'passbolt_%installUuid%'
-  - /infinite/os cron delete -d "PassboltCron"
+  - mappingId=$(os vhost mapping get | jq '.body[] | select(.hostname == "%installHostname%") | .mappings[] | select(.path == "%installUrlPath%") | .id') && os vhost mapping delete --id ${mappingId}
+  - os db delete-user --db-type mysql --db-name 'passbolt_%installUuid%' --db-username 'passbolt_%installUuid%'
+  - os db delete --db-type mysql --db-name 'passbolt_%installUuid%'
+  - os cron delete -d "PassboltCron"
   - apt -qqy remove jq && apt -qqy autoremove
 uninstallFileNames:
   - package-lock.json
