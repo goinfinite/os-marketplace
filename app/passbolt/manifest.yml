@@ -5,7 +5,7 @@ name: Passbolt
 type: app
 description: Passbolt is an open source credential platform for modern teams. A versatile, battle-tested solution to manage and collaborate on passwords, accesses, and secrets. All in one.
 services:
-  - php:8.3
+  - php
   - mariadb
 mappings:
   - path: /
