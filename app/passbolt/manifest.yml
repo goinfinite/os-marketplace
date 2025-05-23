@@ -65,7 +65,7 @@ installCmdSteps:
   - cp -u %marketplaceCatalogItemAssetsDirPath%/passbolt.default.php %installDirectory%/config/passbolt.php
   - chown -R nobody:nogroup %installDirectory%
   - cp -u %marketplaceCatalogItemAssetsDirPath%/gpg-key-template.txt %installTempDir%
-  - sed -i 's/name_real/%installHostname%/' %installTempDir%/gpg-key-template.txt
+  - sed -i 's/name_real/%adminFirstName% %adminLastName%/' %installTempDir%/gpg-key-template.txt
   - sed -i 's/name_email/%adminMailAddress%/' %installTempDir%/gpg-key-template.txt
   - su nobody --shell /bin/bash -c 'gpg --batch --no-tty --gen-key <<<"$(cat %installTempDir%/gpg-key-template.txt)"'
   - su nobody --shell /bin/bash -c "gpg --armor --export-secret-keys %adminMailAddress% >%installDirectory%/config/gpg/serverkey_private.asc"
