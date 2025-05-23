@@ -62,7 +62,7 @@ installCmdSteps:
   - usermod -d %installDirectory% nobody
   - git config --global --add safe.directory %installDirectory%
   - git clone https://github.com/passbolt/passbolt_api.git %installDirectory%
-  - composer install --working-dir %installDirectory% --no-dev --no-interaction --quiet
+  - /usr/local/lsws/lsphp83/bin/php /usr/local/bin/composer install --working-dir %installDirectory% --no-dev --no-interaction --quiet
   - cp -u %marketplaceCatalogItemAssetsDirPath%/passbolt.default.php %installDirectory%/config/passbolt.php
   - chown -R nobody:nogroup %installDirectory%
   - cp -u %marketplaceCatalogItemAssetsDirPath%/gpg-key-template.txt %installTempDir%
@@ -81,10 +81,10 @@ installCmdSteps:
   - sed -i 's/smtp_password/%smtpPassword%/' %installDirectory%/config/passbolt.php
   - sed -i 's/smtp_from/%smtpFrom%/' %installDirectory%/config/passbolt.php
   - pubKey=$(su nobody --shell /bin/bash -c 'gpg --list-keys | grep -oP "[[:xdigit:]]{40}"') && sed -i "s/gpg_fingerprint/${pubKey}/" %installDirectory%/config/passbolt.php
-  - su nobody --shell /bin/bash -c "bash %installDirectory%/bin/cake passbolt create_jwt_keys --quiet"
+  - su nobody --shell /bin/bash -c "/usr/local/lsws/lsphp83/bin/php %installDirectory%/bin/cake.php passbolt create_jwt_keys --quiet"
   - chmod 500 %installDirectory%/config/jwt/
-  - su nobody --shell /bin/bash -c "bash %installDirectory%/bin/cake passbolt install --admin-first-name %adminFirstName% --admin-last-name %adminLastName% --admin-username %adminMailAddress%" 2>/dev/null
-  - os cron create -s "* * * * *" -d "PassboltCron" -c "su nobody --shell /bin/bash -c 'bash %installDirectory%/bin/cake EmailQueue.sender'"
+  - su nobody --shell /bin/bash -c "/usr/local/lsws/lsphp83/bin/php %installDirectory%/bin/cake.php passbolt install --admin-first-name %adminFirstName% --admin-last-name %adminLastName% --admin-username %adminMailAddress%" 2>/dev/null
+  - os cron create -s "* * * * *" -d "PassboltCron" -c "su nobody --shell /bin/bash -c '/usr/local/lsws/lsphp83/bin/php %installDirectory%/bin/cake.php EmailQueue.sender'"
   - os services update --name php --status restart
 uninstallCmdSteps:
   - os db delete-user --db-type mysql --db-name 'passbolt_%installUuid%' --db-username 'passbolt_%installUuid%'
