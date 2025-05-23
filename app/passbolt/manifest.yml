@@ -86,10 +86,11 @@ installCmdSteps:
   - os cron create -s "* * * * *" -d "PassboltCron" -c "su nobody --shell /bin/bash -c '/usr/local/lsws/lsphp83/bin/php %installDirectory%/bin/cake.php EmailQueue.sender'"
   - os services update --name php --status restart
 uninstallCmdSteps:
+  - pubKey=$(grep -oP '[[:xdigit:]]{40}' %installDirectory%/config/passbolt.php) && su nobody --shell /bin/bash -c "gpg --batch --yes --delete-secret-keys ${pubKey}" && su nobody --shell /bin/bash -c "gpg --batch --yes --delete-keys ${pubKey}"
+  - mkdir -p /app/.trash/passbolt-%installHostname%-%installUuid%
+  - shopt -s dotglob && mv %installDirectory%/* /app/.trash/passbolt-%installHostname%-%installUuid%/ && shopt -u dotglob
   - os db delete-user --db-type mysql --db-name 'passbolt_%installUuid%' --db-username 'passbolt_%installUuid%'
   - os db delete --db-type mysql --db-name 'passbolt_%installUuid%'
   - os cron delete -d "PassboltCron"
-uninstallFileNames:
-  - package-lock.json
 estimatedSizeBytes: 225409823
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/passbolt/assets/avatar.jpg
