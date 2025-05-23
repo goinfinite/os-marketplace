@@ -1,0 +1,96 @@
+manifestVersion: v1
+slugs:
+  - passbolt
+name: Passbolt
+type: app
+description: Passbolt is an open source credential platform for modern teams. A versatile, battle-tested solution to manage and collaborate on passwords, accesses, and secrets. All in one.
+services:
+  - php
+  - mariadb
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: php
+dataFields:
+  - name: adminFirstName
+    label: Admin First Name
+    type: text
+    specificType: username
+    isRequired: true
+  - name: adminLastName
+    label: Admin Last Name
+    type: text
+    isRequired: true
+  - name: adminMailAddress
+    label: Admin Email
+    type: email
+    specificType: email
+    isRequired: true
+  - name: smtpFrom
+    label: SMTP From Address
+    type: text
+    specificType: email
+    isRequired: true
+  - name: smtpHost
+    label: SMTP Host
+    type: text
+    isRequired: true
+  - name: smtpPort
+    label: SMTP Port
+    type: text
+    isRequired: true
+  - name: smtpUsername
+    label: SMTP Username
+    type: text
+    isRequired: true
+  - name: smtpPassword
+    label: SMTP Password
+    type: password
+    isRequired: true
+installCmdSteps:
+  - install_packages libgpgme-dev
+  - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
+  - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
+  - os runtime php update --hostname %installHostname% --version 8.3
+  - for extension in ldap pear; do os runtime php update-module --hostname %installHostname% --name ${extension} --status true --version 8.3; done
+  - if [[ ! -f /usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini ]]; then /usr/local/lsws/lsphp83/bin/pecl install gnupg && echo "extension=gnupg.so" >/usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini; fi
+  - os services update --name php --status restart
+  - os db create --db-type mysql --db-name 'passbolt_%installUuid%'
+  - os db create-user --db-type mysql --db-name 'passbolt_%installUuid%' --username 'passbolt_%installUuid%' --password '%installRandomPassword%' --privileges all
+  - usermod -d /app nobody
+  - git config --global --add safe.directory %installDirectory%
+  - git clone https://github.com/passbolt/passbolt_api.git %installDirectory%
+  - /usr/local/lsws/lsphp83/bin/php /usr/local/bin/composer install --working-dir %installDirectory% --no-dev --no-interaction --quiet
+  - cp -u %marketplaceCatalogItemAssetsDirPath%/passbolt.default.php %installDirectory%/config/passbolt.php
+  - chown -R nobody:nogroup %installDirectory%
+  - cp -u %marketplaceCatalogItemAssetsDirPath%/gpg-key-template.txt %installTempDir%
+  - sed -i 's/name_real/%adminFirstName% %adminLastName%/' %installTempDir%/gpg-key-template.txt
+  - sed -i 's/name_email/%adminMailAddress%/' %installTempDir%/gpg-key-template.txt
+  - su nobody --shell /bin/bash -c 'gpg --batch --no-tty --gen-key <<<"$(cat %installTempDir%/gpg-key-template.txt)"'
+  - su nobody --shell /bin/bash -c "gpg --armor --export-secret-keys %adminMailAddress% >%installDirectory%/config/gpg/serverkey_private.asc"
+  - su nobody --shell /bin/bash -c "gpg --armor --export %adminMailAddress% >%installDirectory%/config/gpg/serverkey.asc"
+  - sed -i 's/goinfinite.local/%installHostname%/g' %installDirectory%/config/passbolt.php
+  - sed -i 's/datasource_username/passbolt_%installUuid%/' %installDirectory%/config/passbolt.php
+  - sed -i 's/datasource_password/%installRandomPassword%/' %installDirectory%/config/passbolt.php
+  - sed -i 's/datasource_database/passbolt_%installUuid%/' %installDirectory%/config/passbolt.php
+  - sed -i 's/smtp_host/%smtpHost%/' %installDirectory%/config/passbolt.php
+  - sed -i 's/smtp_port/%smtpPort%/' %installDirectory%/config/passbolt.php
+  - sed -i 's/smtp_username/%smtpUsername%/' %installDirectory%/config/passbolt.php
+  - sed -i 's/smtp_password/%smtpPassword%/' %installDirectory%/config/passbolt.php
+  - sed -i 's/smtp_from/%smtpFrom%/' %installDirectory%/config/passbolt.php
+  - pubKey=$(su nobody --shell /bin/bash -c 'gpg --list-keys | grep -oP "[[:xdigit:]]{40}"') && sed -i "s/gpg_fingerprint/${pubKey}/" %installDirectory%/config/passbolt.php
+  - su nobody --shell /bin/bash -c "/usr/local/lsws/lsphp83/bin/php %installDirectory%/bin/cake.php passbolt create_jwt_keys --quiet"
+  - chmod 500 %installDirectory%/config/jwt/
+  - su nobody --shell /bin/bash -c "/usr/local/lsws/lsphp83/bin/php %installDirectory%/bin/cake.php passbolt install --admin-first-name %adminFirstName% --admin-last-name %adminLastName% --admin-username %adminMailAddress%" 2>/dev/null
+  - os cron create -s "* * * * *" -d "PassboltCron" -c "su nobody --shell /bin/bash -c '/usr/local/lsws/lsphp83/bin/php %installDirectory%/bin/cake.php EmailQueue.sender'"
+  - os services update --name php --status restart
+uninstallCmdSteps:
+  - pubKey=$(grep -oP '[[:xdigit:]]{40}' %installDirectory%/config/passbolt.php) && su nobody --shell /bin/bash -c "gpg --batch --yes --delete-secret-keys ${pubKey}" && su nobody --shell /bin/bash -c "gpg --batch --yes --delete-keys ${pubKey}"
+  - mkdir -p /app/.trash/passbolt-%installHostname%-%installUuid%
+  - shopt -s dotglob && mv %installDirectory%/* /app/.trash/passbolt-%installHostname%-%installUuid%/ && shopt -u dotglob
+  - os db delete-user --db-type mysql --db-name 'passbolt_%installUuid%' --db-username 'passbolt_%installUuid%'
+  - os db delete --db-type mysql --db-name 'passbolt_%installUuid%'
+  - os cron delete -d "PassboltCron"
+estimatedSizeBytes: 225409823
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/passbolt/assets/avatar.jpg
