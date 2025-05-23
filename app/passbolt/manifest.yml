@@ -54,12 +54,11 @@ installCmdSteps:
   - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
   - os runtime php update --hostname %installHostname% --version 8.3
   - for extension in ldap pear; do os runtime php update-module --hostname %installHostname% --name ${extension} --status true --version 8.3; done
-  - if [[ ! -f /usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini ]]; then /usr/local/lsws/lsphp83/bin/pecl install gnupg; fi
-  - echo "extension=gnupg.so" >>/usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini
+  - if [[ ! -f /usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini ]]; then /usr/local/lsws/lsphp83/bin/pecl install gnupg && echo "extension=gnupg.so" >/usr/local/lsws/lsphp83/etc/php/8.3/mods-available/gnupg.ini; fi
   - os services update --name php --status restart
   - os db create --db-type mysql --db-name 'passbolt_%installUuid%'
   - os db create-user --db-type mysql --db-name 'passbolt_%installUuid%' --username 'passbolt_%installUuid%' --password '%installRandomPassword%' --privileges all
-  - usermod -d %installDirectory% nobody
+  - usermod -d /app nobody
   - git config --global --add safe.directory %installDirectory%
   - git clone https://github.com/passbolt/passbolt_api.git %installDirectory%
   - /usr/local/lsws/lsphp83/bin/php /usr/local/bin/composer install --working-dir %installDirectory% --no-dev --no-interaction --quiet
