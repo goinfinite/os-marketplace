@@ -67,10 +67,10 @@ installCmdSteps:
   - chown -R nobody:nogroup %installDirectory%
   - cp -u %marketplaceCatalogItemAssetsDirPath%/gpg-key-template.txt %installTempDir%
   - sed -i 's/name_real/%installHostname%/' %installTempDir%/gpg-key-template.txt
-  - sed -i 's/name_email/admin@%installHostname%/' %installTempDir%/gpg-key-template.txt
+  - sed -i 's/name_email/%adminMailAddress%/' %installTempDir%/gpg-key-template.txt
   - su nobody --shell /bin/bash -c 'gpg --batch --no-tty --gen-key <<<"$(cat %installTempDir%/gpg-key-template.txt)"'
-  - su nobody --shell /bin/bash -c "gpg --armor --export-secret-keys admin@%installHostname% >%installDirectory%/config/gpg/serverkey_private.asc"
-  - su nobody --shell /bin/bash -c "gpg --armor --export admin@%installHostname% >%installDirectory%/config/gpg/serverkey.asc"
+  - su nobody --shell /bin/bash -c "gpg --armor --export-secret-keys %adminMailAddress% >%installDirectory%/config/gpg/serverkey_private.asc"
+  - su nobody --shell /bin/bash -c "gpg --armor --export %adminMailAddress% >%installDirectory%/config/gpg/serverkey.asc"
   - sed -i 's/goinfinite.local/%installHostname%/g' %installDirectory%/config/passbolt.php
   - sed -i 's/datasource_username/passbolt_%installUuid%/' %installDirectory%/config/passbolt.php
   - sed -i 's/datasource_password/%installRandomPassword%/' %installDirectory%/config/passbolt.php
