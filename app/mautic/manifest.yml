@@ -48,9 +48,9 @@ installCmdSteps:
   - /usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:install %installHostname% --db_host=localhost --db_port=3306 --db_name='mautic_%installUuid%' --db_user='mautic_%installUuid%' --db_password='%installRandomPassword%' --admin_username=%adminUsername% --admin_password='%adminPassword%' --admin_email='%adminEmail%' --admin_firstname=%adminFirstName% --admin_lastname=%adminLastName% --no-interaction --force
   - chown -R nobody:nogroup /app/mautic_%installHostname%
   - os services update --name php --status restart
-  - os cron create -s "0,15,30,45 * * * *" -d "mauticCronSegments" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:segments:update"
-  - os cron create -s "5,20,35,50 * * * *" -d "mauticCronCampaignsUpdate" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:campaigns:update"
-  - os cron create -s "10,25,40,55 * * * *" -d "mauticCronCampaignsTrigger" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:campaigns:trigger"
+  - os cron create -s "0,15,30,45 * * * *" -d "mauticSegmentsUpdate" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:segments:update"
+  - os cron create -s "5,20,35,50 * * * *" -d "mauticCampaignsUpdate" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:campaigns:update"
+  - os cron create -s "10,25,40,55 * * * *" -d "mauticCampaignsTrigger" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:campaigns:trigger"
 uninstallCmdSteps:
   - rm -f /infinite/mise.toml
   - mv /app/mautic_%installHostname% /app/.trash/mautic_%installHostname%_%installUuid%
