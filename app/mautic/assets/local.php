@@ -1,0 +1,21 @@
+<?php
+$parameters = array(
+  'db_host' => 'localhost',
+  'db_table_prefix' => null,
+  'db_port' => 3306,
+  'db_name' => 'db_name_placeholder',
+  'db_user' => 'db_user_placeholder',
+  'db_password' => 'db_password_placeholder',
+  'db_backup_tables' => false,
+  'db_backup_prefix' => 'bak_',
+  'admin_email' => 'admin_email_placeholder',
+  'admin_password' => 'admin_password_placeholder',
+  'mailer_transport' => null,
+  'mailer_host' => null,
+  'mailer_port' => null,
+  'mailer_user' => null,
+  'mailer_password' => null,
+  'mailer_api_key' => null,
+  'mailer_encryption' => null,
+  'mailer_auth_mode' => null,
+);

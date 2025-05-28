@@ -1,0 +1,69 @@
+manifestVersion: v1
+slugs:
+  - mautic
+name: mautic
+type: app
+description: mautic is an open-source marketing automation platform that helps businesses manage their marketing campaigns, track customer interactions, and automate various marketing tasks.
+services:
+  - php
+  - mariadb
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: php
+dataFields:
+  - name: adminUsername
+    label: Admin Username
+    type: text
+    specificType: username
+    isRequired: true
+  - name: adminPassword
+    label: Admin Password
+    type: password
+    isRequired: true
+  - name: adminFirstName
+    label: Admin First Name
+    type: text
+    isRequired: true
+  - name: adminLastName
+    label: Admin Last Name
+    type: text
+    isRequired: true
+  - name: adminEmail
+    label: Admin Email
+    type: email
+    specificType: email
+    isRequired: true
+installCmdSteps:
+  - os runtime php update --hostname %installHostname% --version 8.3
+  - os runtime php update-setting --hostname %installHostname% --name memory_limit --value 512M --version 8.3
+  - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
+  - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
+  - mise use node@lts && source /etc/profile
+  - os db create --db-type mysql --db-name 'mautic_%installUuid%'
+  - os db create-user --db-type mysql --db-name 'mautic_%installUuid%' --username 'mautic_%installUuid%' --password '%installRandomPassword%' --privileges all
+  - /usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /usr/local/bin/composer create-project mautic/recommended-project /app/mautic_%installHostname%
+  - rm -fr %installDirectory% && ln -s /app/mautic_%installHostname%/docroot %installDirectory%
+  - /usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:install %installHostname% --db_host=localhost --db_port=3306 --db_name='mautic_%installUuid%' --db_user='mautic_%installUuid%' --db_password='%installRandomPassword%' --admin_username=%adminUsername% --admin_password='%adminPassword%' --admin_email='%adminEmail%' --admin_firstname=%adminFirstName% --admin_lastname=%adminLastName% --no-interaction --force
+  - chown -R nobody:nogroup /app/mautic_%installHostname%
+  - os services update --name php --status restart
+  - os cron create -s "0,15,30,45 * * * *" -d "mauticCronSegments" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:segments:update"
+  - os cron create -s "5,20,35,50 * * * *" -d "mauticCronCampaignsUpdate" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:campaigns:update"
+  - os cron create -s "10,25,40,55 * * * *" -d "mauticCronCampaignsTrigger" -c "/usr/local/lsws/lsphp83/bin/php -d memory_limit=512M /app/mautic_%installHostname%/bin/console mautic:campaigns:trigger"
+uninstallCmdSteps:
+  - rm -f /infinite/mise.toml
+  - mv /app/mautic_%installHostname% /app/.trash/mautic_%installHostname%_%installUuid%
+  - unlink %installDirectory% && mkdir %installDirectory% && chown nobody:nogroup %installDirectory%
+  - os db delete-user --db-type mysql --db-name 'mautic_%installUuid%' --db-username 'mautic_%installUuid%'
+  - os db delete --db-type mysql --db-name 'mautic_%installUuid%'
+  - os cron delete -d 'mauticCronSegments'
+  - os cron delete -d 'mauticCronCampaignsUpdate'
+  - os cron delete -d 'mauticCronCampaignsTrigger'
+estimatedSizeBytes: 821133312
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/mautic/assets/avatar.jpg
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/mautic/assets/screenshot-0.png
+  - https://goinfinite.github.io/os-marketplace/app/mautic/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/mautic/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/mautic/assets/screenshot-3.png
