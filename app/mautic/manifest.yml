@@ -1,9 +1,9 @@
 manifestVersion: v1
 slugs:
   - mautic
-name: mautic
+name: Mautic
 type: app
-description: mautic is an open-source marketing automation platform that helps businesses manage their marketing campaigns, track customer interactions, and automate various marketing tasks.
+description: Mautic is an open-source marketing automation platform that helps businesses manage their marketing campaigns, track customer interactions, and automate various marketing tasks.
 services:
   - php
   - mariadb
@@ -57,10 +57,11 @@ uninstallCmdSteps:
   - unlink %installDirectory% && mkdir %installDirectory% && chown nobody:nogroup %installDirectory%
   - os db delete-user --db-type mysql --db-name 'mautic_%installUuid%' --db-username 'mautic_%installUuid%'
   - os db delete --db-type mysql --db-name 'mautic_%installUuid%'
-  - os cron delete -d 'mauticCronSegments'
-  - os cron delete -d 'mauticCronCampaignsUpdate'
-  - os cron delete -d 'mauticCronCampaignsTrigger'
+  - os cron delete -d 'mauticSegmentsUpdate'
+  - os cron delete -d 'mauticCampaignsUpdate'
+  - os cron delete -d 'mauticCampaignsTrigger'
 estimatedSizeBytes: 821133312
+installTimeoutSecs: 600
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/mautic/assets/avatar.jpg
 screenshotUrls:
   - https://goinfinite.github.io/os-marketplace/app/mautic/assets/screenshot-0.png
