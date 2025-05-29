@@ -61,6 +61,7 @@ uninstallCmdSteps:
   - os cron delete -d 'mauticCampaignsUpdate'
   - os cron delete -d 'mauticCampaignsTrigger'
 estimatedSizeBytes: 821133312
+installTimeoutSecs: 600
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/mautic/assets/avatar.jpg
 screenshotUrls:
   - https://goinfinite.github.io/os-marketplace/app/mautic/assets/screenshot-0.png
