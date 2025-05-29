@@ -57,9 +57,9 @@ uninstallCmdSteps:
   - unlink %installDirectory% && mkdir %installDirectory% && chown nobody:nogroup %installDirectory%
   - os db delete-user --db-type mysql --db-name 'mautic_%installUuid%' --db-username 'mautic_%installUuid%'
   - os db delete --db-type mysql --db-name 'mautic_%installUuid%'
-  - os cron delete -d 'mauticCronSegments'
-  - os cron delete -d 'mauticCronCampaignsUpdate'
-  - os cron delete -d 'mauticCronCampaignsTrigger'
+  - os cron delete -d 'mauticSegmentsUpdate'
+  - os cron delete -d 'mauticCampaignsUpdate'
+  - os cron delete -d 'mauticCampaignsTrigger'
 estimatedSizeBytes: 821133312
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/mautic/assets/avatar.jpg
 screenshotUrls:
