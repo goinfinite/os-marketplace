@@ -93,4 +93,10 @@ uninstallCmdSteps:
   - os db delete --db-type mysql --db-name 'passbolt_%installUuid%'
   - os cron delete -d "PassboltCron"
 estimatedSizeBytes: 225409823
+installTimeoutSecs: 600
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/passbolt/assets/avatar.jpg
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/passbolt/assets/screenshot-0.webp
+  - https://goinfinite.github.io/os-marketplace/app/passbolt/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/passbolt/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/passbolt/assets/screenshot-3.png
