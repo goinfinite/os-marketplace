@@ -1,9 +1,9 @@
 manifestVersion: v1
 slugs:
   - mautic
-name: mautic
+name: Mautic
 type: app
-description: mautic is an open-source marketing automation platform that helps businesses manage their marketing campaigns, track customer interactions, and automate various marketing tasks.
+description: Mautic is an open-source marketing automation platform that helps businesses manage their marketing campaigns, track customer interactions, and automate various marketing tasks.
 services:
   - php
   - mariadb
