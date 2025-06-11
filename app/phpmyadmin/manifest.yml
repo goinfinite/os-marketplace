@@ -1,0 +1,63 @@
+manifestVersion: v1
+slugs:
+  - phpmyadmin
+  - phpMyAdmin
+  - pma
+name: phpMyAdmin
+type: app
+description: phpMyAdmin is a free and open-source administration tool for MySQL and MariaDB, allowing users to manage databases, tables, columns, relations, indexes, users, permissions, and more through a web interface.
+services:
+  - php
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: php
+installCmdSteps:
+  - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
+  - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
+  - mkdir -p %installDirectory% && chown nobody:nogroup %installDirectory%
+  - os runtime php run --hostname %installHostname% --command '/usr/local/bin/composer --no-dev --no-cache create-project phpmyadmin/phpmyadmin %installDirectory%'
+  - os runtime php update --hostname %installHostname% --version 8.3
+uninstallFileNames:
+  - .rtlcssrc.json
+  - ChangeLog
+  - LICENSE
+  - README
+  - README.rst
+  - babel.config.json
+  - composer.json
+  - composer.lock
+  - config.sample.inc.php
+  - doc
+  - examples
+  - favicon.ico
+  - index.html
+  - index.php
+  - jest.config.js
+  - js
+  - libraries
+  - locale
+  - package.json
+  - phpunit.xml.dist
+  - po
+  - robots.txt
+  - scripts
+  - setup
+  - show_config_errors.php
+  - sql
+  - templates
+  - test
+  - themes
+  - tmp
+  - url.php
+  - vendor
+  - yarn.lock
+estimatedSizeBytes: 253755392
+installTimeoutSecs: 600
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/phpmyadmin/assets/avatar.jpg
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/phpmyadmin/assets/screenshot-0.png
+  - https://goinfinite.github.io/os-marketplace/app/phpmyadmin/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/phpmyadmin/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/phpmyadmin/assets/screenshot-3.png
