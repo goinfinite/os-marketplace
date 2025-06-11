@@ -91,7 +91,6 @@ feat: add Laravel framework
 feat: add WordPress
 feat: add OpenMage
 feat: add OpenCart
-feat: add OpenCart
 feat: add Joomla
 feat: add Drupal
 feat: add Adobe Commerce
