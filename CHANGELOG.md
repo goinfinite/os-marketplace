@@ -6,6 +6,7 @@
 # 2025/06/11
 
 feat: add phpMyAdmin
+docs: add CHANGELOG.md
 ```
 
 ## v1
