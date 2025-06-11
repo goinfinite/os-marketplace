@@ -63,7 +63,6 @@ fix: set memory_limit on wp clis
 
 # 2025/02 to 2025/03
 
-feat: add passbolt
 docs: add `Avatars` to `README`
 docs: add info about the execution order of `services` and `installCmdSteps` on manifest
 style: lint README markdown
