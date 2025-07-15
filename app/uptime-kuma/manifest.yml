@@ -1,0 +1,36 @@
+manifestVersion: v1
+slugs:
+  - kuma
+  - uptime-kuma
+name: Uptime Kuma
+type: app
+description: Uptime Kuma is a self-hosted status monitoring solution. It provides a user-friendly interface to monitor the uptime of your services, websites, and applications. It supports various notification methods and can be easily deployed on your own server.
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: node
+installCmdSteps:
+  - git config --global --add safe.directory %installDirectory%
+  - git clone https://github.com/louislam/uptime-kuma.git %installDirectory%
+  - echo 'UPTIME_KUMA_DB_TYPE=sqlite' >%installDirectory%/.env
+  - cd %installDirectory% && mise x node@20 -- npm run setup
+  - chown -R nobody:nogroup %installDirectory%
+  - os services create-installable --name node --port-bindings 3001/ws --version 20 --auto-create-mapping false --auto-start true --auto-restart true --startup-file %installDirectory%/server/server.js --working-dir %installDirectory%
+uninstallCmdSteps:
+  - install_packages -qq jq
+  - mkdir -p /app/.trash/uptime-kuma-%installHostname%-%installUuid%
+  - |
+    shopt -s dotglob
+    mv %installDirectory%/* /app/%installHostname%-uptime-kuma/ /app/.trash/uptime-kuma-%installHostname%-%installUuid%/
+    shopt -u dotglob
+  - os services get | jq -r '.body.installedServices[]|select(.startCmd|contains("%installDirectory%/server/server.js"))|.name' | xargs --no-run-if-empty os services delete --name
+  - apt -qqy remove jq && apt -qqy autoremove
+estimatedSizeBytes: 238026752
+installTimeoutSecs: 600
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/uptime-kuma/assets/avatar.png
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/uptime-kuma/assets/screenshot-0.png
+  - https://goinfinite.github.io/os-marketplace/app/uptime-kuma/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/uptime-kuma/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/uptime-kuma/assets/screenshot-3.png
