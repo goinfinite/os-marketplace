@@ -11,6 +11,7 @@
     "dbuser",
     "dotglob",
     "goinfinite",
+    "kuma",
     "lsphp",
     "lsws",
     "mariadb",
@@ -21,6 +22,7 @@
     "nogroup",
     "routerconfigured",
     "shopt",
+    "sqlite",
     "Uuid",
     "wwwroot"
   ]
