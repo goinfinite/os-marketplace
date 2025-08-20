@@ -19,13 +19,11 @@ installCmdSteps:
       sed -i.backup 's/local.*all.*all.*peer/local all all md5/' /etc/postgresql/*/main/pg_hba.conf
       os services update --name postgresql --status restart
       os runtime php update-module --hostname %installHostname% --name pgsql --version 7.4 --status true
-      os services update --name php --status restart
-    else
-      os services update --name php --status restart
     fi
+  - os services update --name php --status restart
 uninstallFileNames:
   - adminer.css
-  - index.php
+  - index.phpz
 installTimeoutSecs: 300
 estimatedSizeBytes: 512000
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/adminer/assets/avatar.png
