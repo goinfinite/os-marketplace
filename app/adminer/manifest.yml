@@ -23,7 +23,7 @@ installCmdSteps:
   - os services update --name php --status restart
 uninstallFileNames:
   - adminer.css
-  - index.phpz
+  - index.php
 installTimeoutSecs: 300
 estimatedSizeBytes: 512000
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/adminer/assets/avatar.png
