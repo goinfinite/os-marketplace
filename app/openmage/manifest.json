@@ -1,5 +1,6 @@
 {
   "manifestVersion": "v1",
+  "id": 5,
   "slugs": ["openmage", "magento1"],
   "name": "OpenMage",
   "type": "app",
