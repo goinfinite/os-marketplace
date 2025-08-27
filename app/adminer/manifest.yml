@@ -1,4 +1,5 @@
 manifestVersion: v1
+id: 13
 slugs:
   - adminer
 name: Adminer

@@ -1,5 +1,6 @@
 {
   "manifestVersion": "v1",
+  "id": 11,
   "slugs": ["drupal"],
   "name": "Drupal",
   "type": "app",
