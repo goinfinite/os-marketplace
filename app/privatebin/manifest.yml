@@ -21,6 +21,7 @@ installCmdSteps:
   - mv %installDirectory%/.htaccess.disabled %installDirectory%/.htaccess
   - cp -u %marketplaceCatalogItemAssetsDirPath%/conf.php %installDirectory%/cfg/conf.php
   - sed -i 's/goinfinite.local/%installHostname%/g' %installDirectory%/cfg/conf.php
+  - while ! supervisorctl status php-webserver | grep -iq RUNNING; do sleep 1; done
   - os runtime php update --hostname %installHostname% --version 8.3
 uninstallFileNames:
   - .htaccess

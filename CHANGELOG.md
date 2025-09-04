@@ -6,6 +6,7 @@
 # 2025/09/04
 
 feat: add privatebin
+fix: add wait for php to be up and running
 
 # 2025/08/27
 
