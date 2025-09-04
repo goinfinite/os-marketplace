@@ -1,0 +1,55 @@
+manifestVersion: v1
+slugs:
+  - PrivateBin
+  - privatebin
+  - privbin
+name: PrivateBin
+type: app
+description: PrivateBin is a minimalist, open-source online pastebin where the server has zero knowledge of pasted data. It features end-to-end encryption, self-destruction of pastes, and a simple, user-friendly interface.
+services:
+  - php
+mappings:
+  - path: /
+    matchPattern: begins-with
+    targetType: service
+    targetValue: php
+installCmdSteps:
+  - wget -q https://github.com/PrivateBin/PrivateBin/archive/refs/tags/2.0.0.tar.gz -O %installTempDir%/privatebin.tar.gz
+  - cd %installTempDir% && tar -xzf privatebin.tar.gz
+  - shopt -s dotglob && mv %installTempDir%/PrivateBin-2.0.0/* %installDirectory% && shopt -u dotglob
+  - mv %installDirectory%/.htaccess.disabled %installDirectory%/.htaccess
+  - cp -u %marketplaceCatalogItemAssetsDirPath%/conf.php %installDirectory%/cfg/conf.php
+  - sed -i 's/goinfinite.local/%installHostname%/g' %installDirectory%/cfg/conf.php
+  - os runtime php update --hostname %installHostname% --version 8.3
+uninstallFileNames:
+  - .htaccess
+  - CHANGELOG.md
+  - CREDITS.md
+  - LICENSE.md
+  - Procfile
+  - README.md
+  - SECURITY.md
+  - bin
+  - browserconfig.xml
+  - cfg
+  - composer.json
+  - composer.lock
+  - css
+  - data
+  - i18n
+  - img
+  - index.php
+  - js
+  - lib
+  - manifest.json
+  - robots.txt
+  - tpl
+  - vendor
+estimatedSizeBytes: 3331599
+installTimeoutSecs: 300
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/privatebin/assets/avatar.jpg
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/privatebin/assets/screenshot-0.png
+  - https://goinfinite.github.io/os-marketplace/app/privatebin/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/privatebin/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/privatebin/assets/screenshot-3.png
