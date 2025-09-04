@@ -3,6 +3,18 @@
 ## v2
 
 ```
+# 2025/09/04
+
+feat: add privatebin
+
+# 2025/08/27
+
+chore: update manifests ids
+
+# 2025/08/22
+
+feat: add adminer
+
 # 2025/07/15
 
 feat: add uptime kuma
