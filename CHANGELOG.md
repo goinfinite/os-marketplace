@@ -3,6 +3,10 @@
 ## v2
 
 ```
+# 2025/12/10
+
+feat: add umami
+
 # 2025/09/04
 
 feat: add privatebin
