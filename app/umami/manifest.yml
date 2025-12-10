@@ -1,0 +1,88 @@
+manifestVersion: v1
+id: 16
+slugs:
+  - umami
+name: Umami
+type: app
+description: Umami is a self-hosted analytics platform. It provides a user-friendly interface to monitor your website traffic.
+services:
+  - postgresql:16
+installCmdSteps:
+  - git config --global --add safe.directory %installDirectory%/
+  - git clone https://github.com/umami-software/umami.git %installDirectory%/
+  - cp -u %marketplaceCatalogItemAssetsDirPath%/start_umami.sh /app/
+  - sed -i 's|install_dir|%installDirectory%|g' /app/start_umami.sh
+  - chown nobody:nogroup /app/start_umami.sh
+  - cp -u %marketplaceCatalogItemAssetsDirPath%/env.txt %installDirectory%/.env
+  - |
+    appSecret=$(date | sha256sum | head -c 32)
+    sed -i "s|secret|${appSecret}|" %installDirectory%/.env
+    sed -i 's|db_name|umami_%installUuid%|' %installDirectory%/.env
+    sed -i 's|db_user|umami_%installUuid%|' %installDirectory%/.env
+    sed -i 's|db_pass|%installRandomPassword%|' %installDirectory%/.env
+    sed -i 's|base_path|%installUrlPath%|' %installDirectory%/.env
+    if [[ %installUrlPath% == "/" ]]; then
+      sed -i '/BASE_PATH/d' %installDirectory%/.env
+    fi
+  - |
+    os db create \
+      --db-type postgresql \
+      --db-name 'umami_%installUuid%'
+    os db create-user \
+      --db-type postgresql \
+      --db-name 'umami_%installUuid%' \
+      --username 'umami_%installUuid%' \
+      --password '%installRandomPassword%' \
+      --privileges all
+  - |
+    cp -u %marketplaceCatalogItemAssetsDirPath%/umami_user_privileges.sql %installTempDir%/umami_user_privileges.sql
+    sed -i "s|umami_user|umami_%installUuid%|g" %installTempDir%/umami_user_privileges.sql
+    psql -U postgres -d umami_%installUuid% -h 127.0.0.1 <%installTempDir%/umami_user_privileges.sql
+  - |
+    cd %installDirectory%
+    mise use -g node@lts && source /etc/profile
+    mise x pnpm@10.24 -- pnpm install
+    mise x pnpm@10.24 -- pnpm build
+  - |
+    os services create-custom \
+      --name umami \
+      --port-bindings 3000/ws \
+      --version 3 \
+      --auto-create-mapping true \
+      --mapping-hostname %installHostname% \
+      --mapping-path %installUrlPath% \
+      --auto-start true \
+      --auto-restart true \
+      --type application \
+      --start-command "bash /app/start_umami.sh"
+uninstallCmdSteps:
+  - |
+    psql -U postgres -d umami_%installUuid% -h 127.0.0.1 -c "DROP OWNED BY umami_%installUuid%;"
+    os db delete-user \
+      --db-type postgresql \
+      --db-name 'umami_%installUuid%' \
+      --db-username 'umami_%installUuid%'
+    os db delete \
+      --db-type postgresql \
+      --db-name 'umami_%installUuid%'
+  - |
+    shopt -s dotglob
+    mkdir -p /app/.trash/umami-%installHostname%-%installUuid%
+    mv %installDirectory%/* /app/%installHostname%-umami/ /app/.trash/umami-%installHostname%-%installUuid%/
+    mv /app/start_umami.sh /app/.trash/umami-%installHostname%-%installUuid%/
+    chown -R nobody:nogroup /app/.trash/umami-%installHostname%-%installUuid%
+    shopt -u dotglob
+  - |
+    install_packages -qqy jq
+    os services get |
+      jq -r '.body.installedServices[]|select(.startCmd|contains("/app/start_umami.sh"))|.name' |
+      xargs --no-run-if-empty os services delete --name
+  - apt-get -qqy remove jq && apt-get -qqy autoremove
+estimatedSizeBytes: 2160159368
+installTimeoutSecs: 600
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/umami/assets/avatar.png
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/umami/assets/screenshot-0.png
+  - https://goinfinite.github.io/os-marketplace/app/umami/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/umami/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/umami/assets/screenshot-3.png
