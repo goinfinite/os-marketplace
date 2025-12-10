@@ -68,7 +68,7 @@ uninstallCmdSteps:
   - |
     shopt -s dotglob
     mkdir -p /app/.trash/umami-%installHostname%-%installUuid%
-    mv %installDirectory%/* /app/%installHostname%-umami/ /app/.trash/umami-%installHostname%-%installUuid%/
+    mv %installDirectory%/* /app/.trash/umami-%installHostname%-%installUuid%/
     mv /app/start_umami.sh /app/.trash/umami-%installHostname%-%installUuid%/
     chown -R nobody:nogroup /app/.trash/umami-%installHostname%-%installUuid%
     shopt -u dotglob
