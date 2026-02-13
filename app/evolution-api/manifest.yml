@@ -1,0 +1,80 @@
+manifestVersion: v1
+id: 18
+slugs:
+  - evolution
+  - evolution-api
+name: evolution-api
+type: app
+description: Evolution API is an open-source WhatsApp integration API that supports multiple messaging services. It provides a RESTful API for WhatsApp Web control using the Baileys library, with integrations for Typebot, Chatwoot, Dify, OpenAI, and more.
+services:
+  - postgresql:15
+  - redis:7.2
+installCmdSteps:
+  - install_packages -qqy ffmpeg
+  - os db create --db-type postgresql --db-name 'evolution_%installUuid%'
+  - os db create-user --db-type postgresql --db-name 'evolution_%installUuid%' --username 'evolution_%installUuid%' --password '%installRandomPassword%' --privileges all
+  - git clone --branch 2.3.7 --depth 1 https://github.com/EvolutionAPI/evolution-api.git '%installTempDir%'
+  - cd '%installTempDir%' && mise x node@24 -- npm ci --silent
+  - cp '%marketplaceCatalogItemAssetsDirPath%/env.txt' '%installTempDir%/.env'
+  - sed -i 's|server_url|https://%installHostname%|g' '%installTempDir%/.env'
+  - sed -i 's|pg_user|evolution_%installUuid%|g' '%installTempDir%/.env'
+  - sed -i 's|pg_pass|%installRandomPassword%|g' '%installTempDir%/.env'
+  - sed -i 's|pg_db|evolution_%installUuid%|g' '%installTempDir%/.env'
+  - |
+    evolutionApiKey=$(openssl rand -base64 32)
+    sed -i "s|evolution_api_key|${evolutionApiKey}|g" '%installTempDir%/.env'
+  - |
+    cd '%installTempDir%'
+    mise x node@24 -- npm run db:generate
+    mise x node@24 -- npm run db:deploy
+    mise x node@24 -- npm run build
+  - mkdir /app/evolution-api-%installUuid%
+  - mv '%installTempDir%/package.json' /app/evolution-api-%installUuid%/package.json
+  - mv '%installTempDir%/package-lock.json' /app/evolution-api-%installUuid%/package-lock.json
+  - mv '%installTempDir%/node_modules' /app/evolution-api-%installUuid%/node_modules
+  - mv '%installTempDir%/dist' /app/evolution-api-%installUuid%/dist
+  - mv '%installTempDir%/prisma' /app/evolution-api-%installUuid%/prisma
+  - mv '%installTempDir%/manager' /app/evolution-api-%installUuid%/manager
+  - mv '%installTempDir%/public' /app/evolution-api-%installUuid%/public
+  - mv '%installTempDir%/.env' /app/evolution-api-%installUuid%/.env
+  - mv '%installTempDir%/runWithProvider.js' /app/evolution-api-%installUuid%/runWithProvider.js
+  - mv '%installTempDir%/tsup.config.ts' /app/evolution-api-%installUuid%/tsup.config.ts
+  - chown -R nobody:nogroup /app/evolution-api-%installUuid%
+  - chmod 600 /app/evolution-api-%installUuid%/.env
+  - |
+    os services create-installable \
+      --name node \
+      --port-bindings 8080/ws \
+      --version 24 \
+      --auto-create-mapping true \
+      --auto-start true \
+      --auto-restart true \
+      --startup-file /app/evolution-api-%installUuid%/dist/main.js \
+      --working-dir /app/evolution-api-%installUuid%
+uninstallCmdSteps:
+  - |
+    psql -U postgres -d evolution_%installUuid% -h 127.0.0.1 -c "DROP OWNED BY evolution_%installUuid%;"
+    os db delete-user \
+      --db-type postgresql \
+      --db-name 'evolution_%installUuid%' \
+      --db-username 'evolution_%installUuid%'
+    os db delete \
+      --db-type postgresql \
+      --db-name 'evolution_%installUuid%'
+  - mkdir -p '/app/.trash/evolution-api-%installHostname%-%installUuid%'
+  - |
+    shopt -s dotglob
+    mv /app/evolution-api-%installUuid%/* '/app/.trash/evolution-api-%installHostname%-%installUuid%/'
+    rm -r /app/evolution-api-%installUuid%
+    shopt -u dotglob
+  - |
+    install_packages -qqy jq
+    os services get | jq -r '.body.installedServices[]|select(.startCmd|contains("/app/evolution-api-%installUuid%/dist/main.js"))|.name' | xargs --no-run-if-empty os services delete --name
+estimatedSizeBytes: 524288000
+installTimeoutSecs: 900
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/evolution-api/assets/avatar.png
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/evolution-api/assets/screenshot-0.png
+  - https://goinfinite.github.io/os-marketplace/app/evolution-api/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/evolution-api/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/evolution-api/assets/screenshot-3.png
