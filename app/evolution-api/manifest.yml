@@ -40,6 +40,7 @@ installCmdSteps:
   - mv '%installTempDir%/runWithProvider.js' /app/evolution-api-%installUuid%/runWithProvider.js
   - mv '%installTempDir%/tsup.config.ts' /app/evolution-api-%installUuid%/tsup.config.ts
   - chown -R nobody:nogroup /app/evolution-api-%installUuid%
+  - chmod 600 /app/evolution-api-%installUuid%/.env
   - |
     os services create-installable \
       --name node \
