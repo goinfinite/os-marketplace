@@ -6,11 +6,6 @@ slugs:
 name: evolution-api
 type: app
 description: Evolution API is an open-source WhatsApp integration API that supports multiple messaging services. It provides a RESTful API for WhatsApp Web control using the Baileys library, with integrations for Typebot, Chatwoot, Dify, OpenAI, and more.
-mappings:
-  - path: /
-    matchPattern: begins-with
-    targetType: service
-    targetValue: node
 services:
   - postgresql:15
   - redis:7.2
@@ -50,7 +45,7 @@ installCmdSteps:
       --name node \
       --port-bindings 8080/ws \
       --version 24 \
-      --auto-create-mapping false \
+      --auto-create-mapping true \
       --auto-start true \
       --auto-restart true \
       --startup-file /app/evolution-api-%installUuid%/dist/main.js \
