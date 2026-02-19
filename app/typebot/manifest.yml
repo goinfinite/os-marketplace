@@ -1,0 +1,113 @@
+manifestVersion: v1
+id: 15
+slugs:
+  - typebot
+name: Typebot
+type: app
+description: Typebot is a powerful open-source chatbot builder that you can self-host. Create advanced conversational forms and chatbots with 34+ building blocks including text, images, videos, conditional logic, webhooks, OpenAI integration, and more.
+services:
+  - postgresql
+dataFields:
+  - name: adminMailAddress
+    label: Admin Email Address
+    type: email
+    specificType: email
+    isRequired: true
+  - name: builderSubdomain
+    label: Builder Subdomain
+    defaultValue: builder
+    type: text
+    isRequired: true
+  - name: smtpHost
+    label: SMTP Host
+    type: text
+    isRequired: true
+  - name: smtpPort
+    label: SMTP Port
+    type: text
+    isRequired: true
+  - name: smtpUsername
+    label: SMTP Username
+    type: text
+    isRequired: true
+  - name: smtpPassword
+    label: SMTP Password
+    type: password
+    isRequired: true
+  - name: smtpFrom
+    label: SMTP From Address
+    type: email
+    specificType: email
+    isRequired: true
+installCmdSteps:
+  - os vhost create --hostname %builderSubdomain%.%installHostname% --parent %installHostname% --type subdomain
+  - git clone --branch v3.15.2 --depth 1 https://github.com/baptisteArno/typebot.io.git /app/typebot_%installUuid%
+  - cp %marketplaceCatalogItemAssetsDirPath%/env.txt /app/typebot_%installUuid%/.env
+  - cp %marketplaceCatalogItemAssetsDirPath%/mise.toml /app/typebot_%installUuid%/mise.toml
+  - sed -i 's|pg_user|typebot_%installUuid%|g' /app/typebot_%installUuid%/.env
+  - sed -i 's|pg_pass|%installRandomPassword%|g' /app/typebot_%installUuid%/.env
+  - sed -i 's|pg_db|typebot_%installUuid%|g' /app/typebot_%installUuid%/.env
+  - sed -i 's|nextauth_url|https://%builderSubdomain%.%installHostname%|g' /app/typebot_%installUuid%/.env
+  - sed -i 's|next_public_viewer_url|https://%installHostname%|g' /app/typebot_%installUuid%/.env
+  - sed -i 's|admin_email|%adminMailAddress%|g' /app/typebot_%installUuid%/.env
+  - sed -i 's|smtp_host|%smtpHost%|g' /app/typebot_%installUuid%/.env
+  - sed -i 's|smtp_port|%smtpPort%|g' /app/typebot_%installUuid%/.env
+  - sed -i "s|smtp_from|%smtpFrom%|g" /app/typebot_%installUuid%/.env
+  - sed -i "s|smtp_username|%smtpUsername%|g" /app/typebot_%installUuid%/.env
+  - |
+    smtpPassword='%smtpPassword%'
+    smtpPassword="${smtpPassword//$/\\$}" # https://github.com/baptisteArno/typebot.io/issues/2404
+    smtpPassword="${smtpPassword//\\/\\\\}"
+    smtpPassword="${smtpPassword//&/\\&}"
+    sed -i "s|smtp_password|${smtpPassword}|g" /app/typebot_%installUuid%/.env
+  - |
+    encryptionSecret=$(openssl rand -base64 24) # 24 random bytes → Base64 (3 bytes = 4 chars) → 32 string chars
+    sed -i "s|encryption_secret|${encryptionSecret}|g" /app/typebot_%installUuid%/.env
+  - os db create --db-type postgresql --db-name 'typebot_%installUuid%'
+  - os db create-user --db-type postgresql --db-name 'typebot_%installUuid%' --username 'typebot_%installUuid%' --password '%installRandomPassword%' --privileges all
+  - |
+    cd /app/typebot_%installUuid%
+    mise trust && mise install && source /etc/profile
+    bun install
+    bunx turbo db:migrate
+    bunx turbo build --filter=builder... --filter=viewer...
+  - cp %marketplaceCatalogItemAssetsDirPath%/start_builder.sh /app/typebot_%installUuid%/start_builder.sh
+  - cp %marketplaceCatalogItemAssetsDirPath%/start_viewer.sh /app/typebot_%installUuid%/start_viewer.sh
+  - sed -i 's|install_directory|/app/typebot_%installUuid%|g' /app/typebot_%installUuid%/start_builder.sh
+  - sed -i 's|install_directory|/app/typebot_%installUuid%|g' /app/typebot_%installUuid%/start_viewer.sh
+  - chmod +x /app/typebot_%installUuid%/start_builder.sh /app/typebot_%installUuid%/start_viewer.sh
+  - os services create-custom --type application --name typebot-builder --port-bindings 3000/ws --version 1.0 --auto-create-mapping true --auto-start true --auto-restart true --start-command "/app/typebot_%installUuid%/start_builder.sh" --mapping-hostname %builderSubdomain%.%installHostname% --mapping-path /
+  - os services create-custom --type application --name typebot-viewer --port-bindings 3001/ws --version 1.0 --auto-create-mapping true --auto-start true --auto-restart true --start-command "/app/typebot_%installUuid%/start_viewer.sh" --mapping-hostname %installHostname% --mapping-path /
+uninstallCmdSteps:
+  - install_packages -qqy jq
+  - os services get | jq -r '.body.installedServices[]|select(.name|contains("typebot-builder"))|.name' | xargs --no-run-if-empty os services delete --name
+  - os services get | jq -r '.body.installedServices[]|select(.name|contains("typebot-viewer"))|.name' | xargs --no-run-if-empty os services delete --name
+  - os vhost delete --hostname %builderSubdomain%.%installHostname% 2>/dev/null || true
+  - psql -U postgres -d typebot_%installUuid% -h 127.0.0.1 -c "DROP OWNED BY typebot_%installUuid%;" 2>/dev/null || true
+  - |
+    os db delete-user \
+      --db-type postgresql \
+      --db-name 'typebot_%installUuid%' \
+      --db-username 'typebot_%installUuid%'
+    os db delete \
+      --db-type postgresql \
+      --db-name 'typebot_%installUuid%'
+  - mkdir -p '/app/.trash/typebot-%installHostname%-%installUuid%'
+  - |
+    shopt -s dotglob
+    mv /app/typebot_%installUuid%/* '/app/.trash/typebot-%installHostname%-%installUuid%/'
+    rm -r /app/typebot_%installUuid%
+    shopt -u dotglob
+  - apt -qqy remove jq && apt -qqy autoremove
+uninstallFileNames:
+  - typebot-repo
+  - start_builder.sh
+  - start_viewer.sh
+estimatedSizeBytes: 6147702683
+installTimeoutSecs: 600
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/typebot/assets/avatar.png
+screenshotUrls:
+  - https://goinfinite.github.io/os-marketplace/app/typebot/assets/screenshot-0.png
+  - https://goinfinite.github.io/os-marketplace/app/typebot/assets/screenshot-1.png
+  - https://goinfinite.github.io/os-marketplace/app/typebot/assets/screenshot-2.png
+  - https://goinfinite.github.io/os-marketplace/app/typebot/assets/screenshot-3.png
