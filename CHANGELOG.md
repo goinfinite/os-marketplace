@@ -3,6 +3,13 @@
 ## v2
 
 ```
+# 2026/03/26
+
+fix: update n8n manifest to use Node 24 LTS and pin version to 2.13.4
+  - Node version: 20 → 24 (LTS)
+  - n8n version: @latest → @2.13.4 (pinned)
+  - Fixes compatibility issue with n8n@latest requiring Node >= 22.16
+
 # 2025/12/10
 
 feat: add umami

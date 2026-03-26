@@ -16,10 +16,10 @@ installCmdSteps:
   - cp -u %marketplaceCatalogItemAssetsDirPath%/env.txt %installDirectory%/.env
   - sed -i 's|n8n_base_url|%installHostname%|g' %installDirectory%/.env
   - sed -i 's|n8n_user_folder|%installDirectory%|' %installDirectory%/.env
-  - cd %installDirectory% && mise x node@20 -- npm install n8n@latest
-  - os services create-installable --name node --port-bindings 5678/ws --version 20 --auto-create-mapping false --auto-start true --auto-restart true --startup-file %installDirectory%/node_modules/.bin/n8n --working-dir %installDirectory%
+  - cd %installDirectory% && mise x node@24 -- npm install n8n@2.13.4
+  - os services create-installable --name node --port-bindings 5678/ws --version 24 --auto-create-mapping false --auto-start true --auto-restart true --startup-file %installDirectory%/node_modules/.bin/n8n --working-dir %installDirectory%
 uninstallCmdSteps:
-  - cd %installDirectory% && mise x node@20 -- npm uninstall n8n
+  - cd %installDirectory% && mise x node@24 -- npm uninstall n8n
   - mv %installDirectory%/.n8n /app/.trash/.n8n-$(date +%s)
   - os services get | jq -r '.body.installedServices[]|select(.startCmd|contains("%installDirectory%/node_modules/.bin/n8n"))|.name' | xargs --no-run-if-empty os services delete --name
   - rm -fr /root/.npm/
