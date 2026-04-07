@@ -15,7 +15,7 @@ installCmdSteps:
   - chown nobody:nogroup /app/start_umami.sh
   - cp -u %marketplaceCatalogItemAssetsDirPath%/env.txt %installDirectory%/.env
   - |
-    appSecret=$(date | sha256sum | head -c 32)
+    appSecret=$(openssl rand -hex 16)
     sed -i "s|secret|${appSecret}|" %installDirectory%/.env
     sed -i 's|db_name|umami_%installUuid%|' %installDirectory%/.env
     sed -i 's|db_user|umami_%installUuid%|' %installDirectory%/.env
@@ -41,8 +41,8 @@ installCmdSteps:
   - |
     cd %installDirectory%
     mise use -g node@lts && source /etc/profile
-    mise x pnpm@10.24 -- pnpm install
-    mise x pnpm@10.24 -- pnpm build
+    mise x pnpm@10.33 -- pnpm install
+    mise x pnpm@10.33 -- pnpm build
   - |
     os services create-custom \
       --name umami \
