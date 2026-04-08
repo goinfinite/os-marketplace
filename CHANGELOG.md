@@ -3,6 +3,14 @@
 ## v2
 
 ```
+# 2026/04/08
+
+feat: add pocketbase
+  - New app manifest for PocketBase (issue #61)
+  - Uses os services create-custom for standalone binary
+  - Includes dataFields for admin email and password
+  - Superuser created during installation
+
 # 2026/03/26
 
 fix: update n8n manifest to use Node 24 LTS and pin version to 2.13.4
