@@ -22,11 +22,9 @@ installCmdSteps:
   - chmod +x %installDirectory%/pocketbase
   - os services create-custom --type application --name pocketbase-%installUuid% --port-bindings 8090/http --version 0.22.19 --auto-create-mapping true --auto-start true --auto-restart true --start-command "%installDirectory%/pocketbase serve" --mapping-hostname %installHostname% --mapping-path /
   - sleep 5
-  - "%installDirectory%/pocketbase admin create %adminEmail% %adminPassword%"
+  - "%installDirectory%/pocketbase admin create '%adminEmail%' '%adminPassword%'"
 uninstallCmdSteps:
-  - install_packages -qqy jq
-  - os services get | jq -r '.body.installedServices[]|select(.name|contains("pocketbase-"))|.name' | xargs --no-run-if-empty os services delete --name
-  - apt purge -qqy jq
+  - os services get | jq -r '.body.installedServices[] | select(.name | contains("pocketbase")) | select(.portBindings[] | .port == "8090" and .protocol == "http") | .name' | xargs --no-run-if-empty os services delete --name
 uninstallFileNames:
   - pocketbase
   - pb_data
@@ -34,4 +32,4 @@ uninstallFileNames:
   - LICENSE.md
 installTimeoutSecs: 300
 estimatedSizeBytes: 52428800
-avatarUrl: https://goinfinite.github.io/os-marketplace/app/pocketbase/assets/avatar.jpg
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/pocketbase/assets/avatar.png
