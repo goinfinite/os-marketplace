@@ -1,0 +1,37 @@
+manifestVersion: v1
+id: 16
+slugs:
+  - pocketbase
+name: PocketBase
+type: app
+description: PocketBase is an open-source backend solution comprising an embedded SQLite database, built-in auth system, REST API, and admin UI. It provides a single binary deployment for rapid backend development with zero configuration required.
+dataFields:
+  - name: adminEmail
+    label: Admin Email
+    type: email
+    specificType: email
+    isRequired: true
+  - name: adminPassword
+    label: Admin Password
+    type: password
+    specificType: password
+    isRequired: true
+installCmdSteps:
+  - curl -fsSL https://github.com/pocketbase/pocketbase/releases/download/v0.22.19/pocketbase_0.22.19_linux_amd64.zip -o %installTempDir%/pocketbase.zip
+  - unzip -o %installTempDir%/pocketbase.zip -d %installDirectory%
+  - chmod +x %installDirectory%/pocketbase
+  - os services create-custom --type application --name pocketbase-%installUuid% --port-bindings 8090/http --version 0.22.19 --auto-create-mapping true --auto-start true --auto-restart true --start-command "%installDirectory%/pocketbase serve" --mapping-hostname %installHostname% --mapping-path /
+  - sleep 5
+  - "%installDirectory%/pocketbase admin create %adminEmail% %adminPassword%"
+uninstallCmdSteps:
+  - install_packages -qqy jq
+  - os services get | jq -r '.body.installedServices[]|select(.name|contains("pocketbase-"))|.name' | xargs --no-run-if-empty os services delete --name
+  - apt purge -qqy jq
+uninstallFileNames:
+  - pocketbase
+  - pb_data
+  - CHANGELOG.md
+  - LICENSE.md
+installTimeoutSecs: 300
+estimatedSizeBytes: 52428800
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/pocketbase/assets/avatar.jpg
