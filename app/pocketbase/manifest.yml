@@ -18,6 +18,10 @@ dataFields:
     isRequired: true
 installCmdSteps:
   - curl -fsSL https://github.com/pocketbase/pocketbase/releases/download/v0.22.19/pocketbase_0.22.19_linux_amd64.zip -o %installTempDir%/pocketbase.zip
+  - >-
+    EXPECTED_checksum="bf7abfaa4397ef961e9336fdd4d11e8696aa27bf34cc46174e9fc9e6b8bfd19b" &&
+    ACTUAL_checksum=$(sha256sum %installTempDir%/pocketbase.zip | cut -d' ' -f1) &&
+    [ "$ACTUAL_checksum" = "$EXPECTED_checksum" ] || { echo "Checksum mismatch for pocketbase_0.22.19_linux_amd64.zip"; exit 1; }
   - unzip -o %installTempDir%/pocketbase.zip -d %installDirectory%
   - chmod +x %installDirectory%/pocketbase
   - os services create-custom --type application --name pocketbase-%installUuid% --port-bindings 8090/http --version 0.22.19 --auto-create-mapping true --auto-start true --auto-restart true --start-command "%installDirectory%/pocketbase serve" --mapping-hostname %installHostname% --mapping-path /
