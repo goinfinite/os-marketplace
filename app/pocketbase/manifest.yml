@@ -24,11 +24,31 @@ installCmdSteps:
     awk '$NF=="pocketbase_0.22.19_linux_amd64.zip"' checksums.txt | sha256sum -c -
     unzip -o %installTempDir%/pocketbase_0.22.19_linux_amd64.zip -d %installDirectory%
   - chmod +x %installDirectory%/pocketbase
-  - os services create-custom --type application --name pocketbase-%installUuid% --port-bindings 8090/http --version 0.22.19 --auto-create-mapping true --auto-start true --auto-restart true --start-command "%installDirectory%/pocketbase serve" --mapping-hostname %installHostname% --mapping-path /
+  - |
+    os services create-custom \
+      --type application \
+      --name pocketbase-%installUuid% \
+      --port-bindings 8090/http \
+      --version 0.22.19 \
+      --auto-create-mapping true \
+      --auto-start true \
+      --auto-restart true \
+      --start-command "%installDirectory%/pocketbase serve" \
+      --mapping-hostname %installHostname% \
+      --mapping-path %installUrlPath%
   - sleep 5
   - "%installDirectory%/pocketbase admin create '%adminEmail%' '%adminPassword%'"
 uninstallCmdSteps:
-  - os services get | jq -r '.body.installedServices[] | select(.name | contains("pocketbase")) | select(.portBindings[] | .port == "8090" and .protocol == "http") | .name' | xargs --no-run-if-empty os services delete --name
+  - install_packages -qqy jq
+  - |
+    os services get |
+      jq -r '
+        .body.installedServices[] |
+        select(.name | contains("pocketbase")) |
+        select(.portBindings[] | .port == 8090 and .protocol == "http") |
+        .name' |
+        xargs --no-run-if-empty os services delete --name
+  - apt -qqy remove jq && apt -qqy autoremove
 uninstallFileNames:
   - pocketbase
   - pb_data
