@@ -48,7 +48,6 @@ uninstallCmdSteps:
         select(.portBindings[] | .port == 8090 and .protocol == "http") |
         .name' |
         xargs --no-run-if-empty os services delete --name
-  - apt -qqy remove jq && apt -qqy autoremove
 uninstallFileNames:
   - pocketbase
   - pb_data
