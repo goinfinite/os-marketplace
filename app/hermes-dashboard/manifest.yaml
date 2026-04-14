@@ -1,0 +1,47 @@
+manifestVersion: v1
+id: 17
+name: hermes-dashboard
+slugs:
+  - hermes-dash
+  - hermes-dashboard
+type: app
+description: Hermes is a self-improving AI agent by Nous Research. It creates skills from experience, improves them during use, nudges itself to persist knowledge, searches its own past conversations, and builds a deepening model of who you are. Supports Telegram, Discord, Slack, WhatsApp, Signal, and more. Use any LLM via OpenRouter, OpenAI, Anthropic, Nous Portal, and others.
+installCmdSteps:
+  - install_packages -qqy jq
+  - |
+    hermesVersion=$(
+      os services get |
+        jq -r '.body.installedServices[] | select(.name == "hermes-agent") | .version'
+    )
+
+    if [[ -z "${hermesVersion}" ]]; then
+      echo "Hermes agent not found. You must install the Hermes agent before installing the dashboard."
+      exit 1
+    fi
+
+    cp -u %marketplaceCatalogItemAssetsDirPath%/start_hermes_dashboard.sh /app/hermes-agent/
+
+    os services create-custom \
+    --type application \
+    --name hermes-dashboard \
+    --port-bindings 9119/http \
+    --version ${hermesVersion} \
+    --auto-create-mapping true \
+    --auto-start false \
+    --auto-restart false \
+    --start-command "bash /app/hermes-agent/start_hermes_dashboard.sh" \
+    --mapping-hostname %installHostname% \
+    --mapping-path %installUrlPath%
+uninstallCmdSteps:
+  - install_packages -qqy jq
+  - |
+    os services get |
+      jq -r '
+        .body.installedServices[] |
+        select(.name | contains("hermes-dashboard")) |
+        select(.portBindings[] | .port == 9119 and .protocol == "http") |
+        .name' |
+        xargs --no-run-if-empty os services delete --name
+installTimeoutSecs: 300
+estimatedSizeBytes: 166225488
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/hermes-dashboard/assets/avatar.png

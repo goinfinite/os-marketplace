@@ -3,6 +3,10 @@
 ## v2
 
 ```
+# 2026/04/18
+
+feat: add hermes-dashboard
+
 # 2026/04/08
 
 feat: add pocketbase
