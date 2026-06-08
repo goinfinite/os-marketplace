@@ -3,6 +3,14 @@
 ## v2
 
 ```
+# 2026/06/08
+
+feat: add open-webui
+  - New app manifest for Open WebUI (issue #111)
+  - Uses mise python@3.11 for Python runtime
+  - Uses os services create-custom for service management
+  - pip-autoremove cleans orphaned dependencies on uninstall
+
 # 2026/04/18
 
 feat: add hermes-dashboard

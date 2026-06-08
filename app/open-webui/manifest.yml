@@ -1,0 +1,40 @@
+manifestVersion: v1
+id: 19
+slugs:
+  - open-webui
+  - openwebui
+name: Open WebUI
+type: app
+description: |
+  Open WebUI is a self-hosted, extensible web interface for LLM interactions.
+  It provides a ChatGPT-like experience with support for OpenAI-compatible APIs,
+  local models via Ollama, multi-user management, RAG, web search, and rich
+  conversation management.
+installCmdSteps:
+  - mise x python@3.11 -- pip install open-webui==0.9.6
+  - |
+    os services create-custom \
+      --type application \
+      --name open-webui \
+      --port-bindings 8080/ws \
+      --version 0.9.6 \
+      --auto-create-mapping true \
+      --auto-start true \
+      --auto-restart true \
+      --start-command "mise x python@3.11 -- open-webui serve" \
+      --mapping-hostname %installHostname% \
+      --mapping-path %installUrlPath%
+uninstallCmdSteps:
+  - mise x python@3.11 -- pip install pip-autoremove
+  - mise x python@3.11 -- pip-autoremove open-webui -y
+  - mise x python@3.11 -- pip uninstall pip-autoremove -y
+  - install_packages -qqy jq
+  - |
+    os services get |
+      jq -r '.body.installedServices[]|select(.name == "open-webui")|.name' |
+      xargs --no-run-if-empty os services delete --name
+  - apt -qqy remove jq && apt -qqy autoremove
+  - rm -fr /root/.cache/pip/ /root/.cache/huggingface/ /root/.cache/chroma/ /infinite/.webui_secret_key
+installTimeoutSecs: 600
+estimatedSizeBytes: 7000000000
+avatarUrl: https://goinfinite.github.io/os-marketplace/app/open-webui/assets/avatar.png
