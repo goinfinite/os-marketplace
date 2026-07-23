@@ -6,6 +6,8 @@ slugs:
   - hermes-dashboard
 type: app
 description: Hermes is a self-improving AI agent by Nous Research. It creates skills from experience, improves them during use, nudges itself to persist knowledge, searches its own past conversations, and builds a deepening model of who you are. Supports Telegram, Discord, Slack, WhatsApp, Signal, and more. Use any LLM via OpenRouter, OpenAI, Anthropic, Nous Portal, and others.
+services:
+  - hermes-agent
 installCmdSteps:
   - install_packages -qqy jq
   - |

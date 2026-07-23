@@ -3,6 +3,11 @@
 ## v2
 
 ```
+# 2026/07/23
+
+fix: add services field to hermes-dashboard manifest
+  - Declares hermes-agent as a dependency service
+
 # 2026/06/08
 
 feat: add open-webui
