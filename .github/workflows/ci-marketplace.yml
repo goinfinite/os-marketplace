@@ -4,6 +4,9 @@ on:
     - cron: "0 4 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   discover:
     runs-on: ubuntu-latest
@@ -12,6 +15,8 @@ jobs:
       all_items: ${{ steps.discover.outputs.all_items }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
@@ -31,16 +36,6 @@ jobs:
           import json, os, re, yaml
 
           CATALOG_DIRS = ["app", "framework", "stack"]
-
-          SECRET_ENV_MAP = {
-              "smtpHost": "SMTP_HOST",
-              "smtpPort": "SMTP_PORT",
-              "smtpUsername": "SMTP_USERNAME",
-              "smtpPassword": "SMTP_PASSWORD",
-              "smtpFrom": "SMTP_FROM",
-              "adobeCommercePublicKey": "ADOBE_COMMERCE_PUBLIC_KEY",
-              "adobeCommercePrivateKey": "ADOBE_COMMERCE_PRIVATE_KEY",
-          }
 
           NAME_BASED_VALUES = {
               "adminMailAddress": "ci-test@goinfinite.local",
@@ -84,22 +79,6 @@ jobs:
               if "defaultValue" in field:
                   return str(field["defaultValue"])
 
-              if field_is_secret(field):
-                  env_name = SECRET_ENV_MAP.get(name)
-                  if env_name:
-                      env_value = os.environ.get(env_name)
-                      if env_value:
-                          return env_value
-                      if name.endswith("Host") or name.endswith("From"):
-                          return "goinfinite.local"
-                      if name.endswith("Port"):
-                          return "587"
-                      if name.endswith("Username"):
-                          return "ci_tester"
-                      if name.endswith("Password"):
-                          return "CITestP@ss123!"
-                  return None
-
               specific_type = field.get("specificType")
               if specific_type == "email":
                   return "ci-test@goinfinite.local"
@@ -136,7 +115,7 @@ jobs:
                           if not os.environ.get("ADOBE_COMMERCE_PUBLIC_KEY") or not os.environ.get("ADOBE_COMMERCE_PRIVATE_KEY"):
                               return "skip", "Adobe Commerce auth keys not configured", None, None
                       elif name.startswith("smtp"):
-                          if not os.environ.get("SMTP_HOST"):
+                          if not os.environ.get("SMTP_HOST") or not os.environ.get("SMTP_PORT") or not os.environ.get("SMTP_USERNAME") or not os.environ.get("SMTP_PASSWORD") or not os.environ.get("SMTP_FROM"):
                               return "skip", "SMTP credentials not configured", None, None
 
               non_secret_flags = []
@@ -218,14 +197,23 @@ jobs:
         id: os-version
         run: |
           latest_tag=$(curl -s "https://registry.hub.docker.com/v2/repositories/goinfinite/os/tags?page_size=5" | jq -r '.results | sort_by(.last_updated) | reverse[] | .name' | grep -v latest | head -1)
+          if [ -z "${latest_tag}" ]; then
+            echo "::error::No usable OS image tag found from Docker Hub"
+            exit 1
+          fi
           echo "OS image tag: ${latest_tag}"
           echo "os_tag=${latest_tag}" >> "$GITHUB_OUTPUT"
       - name: Pull OS image
-        run: docker pull docker.io/goinfinite/os:${{ steps.os-version.outputs.os_tag }}
+        env:
+          OS_TAG: ${{ steps.os-version.outputs.os_tag }}
+        run: docker pull docker.io/goinfinite/os:${OS_TAG}
       - name: Start container
         id: start
+        env:
+          ITEM_SLUG: ${{ matrix.item.slug }}
+          OS_TAG: ${{ steps.os-version.outputs.os_tag }}
         run: |
-          container_name="${{ matrix.item.slug }}-ci-${{ github.run_id }}"
+          container_name="${ITEM_SLUG}-ci-${{ github.run_id }}"
           echo "container_name=${container_name}" >> "$GITHUB_OUTPUT"
           docker run -d --rm \
             --name "${container_name}" \
@@ -233,12 +221,13 @@ jobs:
             --memory=4G \
             --env "PRIMARY_VHOST=goinfinite.local" \
             --env "LOG_LEVEL=debug" \
-            docker.io/goinfinite/os:${{ steps.os-version.outputs.os_tag }}
+            docker.io/goinfinite/os:${OS_TAG}
       - name: Wait for container readiness
+        env:
+          CONTAINER_NAME: ${{ steps.start.outputs.container_name }}
         run: |
-          container_name="${{ steps.start.outputs.container_name }}"
           for attempt in $(seq 1 12); do
-            if docker exec "${container_name}" os version >/dev/null 2>&1; then
+            if docker exec "${CONTAINER_NAME}" os version >/dev/null 2>&1; then
               echo "Container ready (attempt ${attempt})"
               exit 0
             fi
@@ -248,6 +237,11 @@ jobs:
           exit 1
       - name: Install marketplace item
         env:
+          CONTAINER_NAME: ${{ steps.start.outputs.container_name }}
+          ITEM_SLUG: ${{ matrix.item.slug }}
+          INSTALL_FLAGS_JSON: ${{ matrix.item.installFlags }}
+          NEEDS_SECRET_FLAGS: ${{ matrix.item.needsSecretFlags }}
+          SECRET_FLAG_NAMES_JSON: ${{ matrix.item.secretFlagNames }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
@@ -256,21 +250,15 @@ jobs:
           ADOBE_COMMERCE_PUBLIC_KEY: ${{ secrets.ADOBE_COMMERCE_PUBLIC_KEY }}
           ADOBE_COMMERCE_PRIVATE_KEY: ${{ secrets.ADOBE_COMMERCE_PRIVATE_KEY }}
         run: |
-          container_name="${{ steps.start.outputs.container_name }}"
-          slug="${{ matrix.item.slug }}"
-          install_flags_json='${{ matrix.item.installFlags }}'
-          needs_secret_flags='${{ matrix.item.needsSecretFlags }}'
-          secret_flag_names_json='${{ matrix.item.secretFlagNames }}'
-
-          result_file="result-${slug}.json"
+          result_file="result-${ITEM_SLUG}.json"
           tmp_out=$(mktemp)
 
           flags=()
           while IFS= read -r arg; do
               flags+=("$arg")
-          done < <(python3 -c "import json,sys; [print(a) for a in json.loads(sys.argv[1])]" "$install_flags_json")
+          done < <(python3 -c "import json,sys; [print(a) for a in json.loads(sys.argv[1])]" "$INSTALL_FLAGS_JSON")
 
-          if [ "$needs_secret_flags" = "true" ]; then
+          if [ "$NEEDS_SECRET_FLAGS" = "true" ]; then
               while IFS= read -r field_name; do
                   case "$field_name" in
                       smtpHost)               val="${SMTP_HOST}" ;;
@@ -285,23 +273,27 @@ jobs:
                   if [ -n "$val" ]; then
                       flags+=("-f" "${field_name}:${val}")
                   fi
-              done < <(python3 -c "import json,sys; [print(a) for a in json.loads(sys.argv[1])]" "$secret_flag_names_json")
+              done < <(python3 -c "import json,sys; [print(a) for a in json.loads(sys.argv[1])]" "$SECRET_FLAG_NAMES_JSON")
           fi
 
           set +e
-          docker exec "${container_name}" \
-            os mktplace install -s "${slug}" -n goinfinite.local -d / \
+          docker exec "${CONTAINER_NAME}" \
+            os mktplace install -s "${ITEM_SLUG}" -n goinfinite.local -d / \
             "${flags[@]}" \
             > "${tmp_out}" 2>&1
           exit_code=$?
           set -e
 
-          CI_SLUG="${slug}" CI_EXIT="${exit_code}" CI_OUT="${tmp_out}" CI_RESULT="${result_file}" \
+          CI_SLUG="${ITEM_SLUG}" CI_EXIT="${exit_code}" CI_OUT="${tmp_out}" CI_RESULT="${result_file}" \
             python3 -c "
           import json, os, re
 
           REDACT_PATTERNS = [
               (r'(smtpPassword[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpUsername[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpHost[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpPort[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpFrom[=:])\s*\S+', r'\1***REDACTED***'),
               (r'(adobeCommercePublicKey[=:])\s*\S+', r'\1***REDACTED***'),
               (r'(adobeCommercePrivateKey[=:])\s*\S+', r'\1***REDACTED***'),
           ]
@@ -330,9 +322,10 @@ jobs:
           path: result-${{ matrix.item.slug }}.json
       - name: Cleanup container
         if: always()
+        env:
+          CONTAINER_NAME: ${{ steps.start.outputs.container_name }}
         run: |
-          container_name="${{ steps.start.outputs.container_name }}"
-          docker rm -f "${container_name}" 2>/dev/null || true
+          docker rm -f "${CONTAINER_NAME}" 2>/dev/null || true
 
   report:
     needs: [discover, test]
@@ -385,8 +378,6 @@ jobs:
                       test_status = "FAIL"
                       failures += 1
                       output = tr.get("output", "")
-                      if not output:
-                          output = tr.get("stdout", "") + tr.get("stderr", "")
                       last_line = output.strip().split("\n")[-1] if output.strip() else ""
                       detail = (last_line or f"exit code {exit_code}")[:120]
               elif status == "test":
