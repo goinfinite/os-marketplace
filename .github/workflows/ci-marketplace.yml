@@ -1,0 +1,416 @@
+name: "Marketplace CI"
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+      all_items: ${{ steps.discover.outputs.all_items }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Discover and classify marketplace items
+        id: discover
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          ADOBE_COMMERCE_PUBLIC_KEY: ${{ secrets.ADOBE_COMMERCE_PUBLIC_KEY }}
+          ADOBE_COMMERCE_PRIVATE_KEY: ${{ secrets.ADOBE_COMMERCE_PRIVATE_KEY }}
+        run: |
+          pip install pyyaml -q
+          python3 << 'PYEOF'
+          import json, os, re, yaml
+
+          CATALOG_DIRS = ["app", "framework", "stack"]
+
+          NAME_BASED_VALUES = {
+              "adminMailAddress": "ci-test@goinfinite.local",
+              "adminPassword": "CITestP@ss123!",
+              "adminUsername": "ci_tester",
+              "adminFirstName": "CI",
+              "adminLastName": "Tester",
+              "locale": "en_US",
+              "timezone": "America/Los_Angeles",
+              "currency": "USD",
+              "edition": "community",
+              "siteFullName": "CI Test Site",
+              "siteShortName": "CI-Test",
+              "builderSubdomain": "builder-ci",
+          }
+
+          def find_manifest(entry_dir):
+              for filename in ("manifest.json", "manifest.yml", "manifest.yaml"):
+                  path = os.path.join(entry_dir, filename)
+                  if os.path.isfile(path):
+                      return path
+              return None
+
+          def parse_manifest(path):
+              with open(path) as f:
+                  if path.endswith(".json"):
+                      return json.load(f)
+                  return yaml.safe_load(f)
+
+          def sanitize_shell_value(value):
+              # Strip shell metacharacters and characters that break Bash quoting
+              return re.sub(r"[\$()\x60;|&<>\n\r']", '', value)
+
+          def field_is_secret(field):
+              name = field.get("name", "")
+              return name.startswith("smtp") or name.startswith("adobeCommerce")
+
+          def resolve_field_value(field):
+              name = field.get("name", "")
+
+              if "defaultValue" in field:
+                  return str(field["defaultValue"])
+
+              specific_type = field.get("specificType")
+              if specific_type == "email":
+                  return "ci-test@goinfinite.local"
+              if specific_type == "password":
+                  return "CITestP@ss123!"
+              if specific_type == "username":
+                  return "ci_tester"
+
+              if field.get("type") == "select" and field.get("options"):
+                  return str(field["options"][0])
+
+              if name in NAME_BASED_VALUES:
+                  return NAME_BASED_VALUES[name]
+
+              return "ci_test_value"
+
+          def classify_item(manifest, entry, entry_dir):
+              if manifest is None:
+                  return "skip", "No manifest found", None, None
+
+              slugs = manifest.get("slugs", [])
+              if not slugs:
+                  return "skip", "No slugs defined in manifest", None, None
+
+              slug = slugs[0]
+
+              if not re.match(r'^[a-zA-Z0-9_-]+$', slug):
+                  return "skip", "Invalid slug characters", None, None
+
+              for field in manifest.get("dataFields", []):
+                  if field_is_secret(field):
+                      name = field["name"]
+                      if name.startswith("adobeCommerce"):
+                          if not os.environ.get("ADOBE_COMMERCE_PUBLIC_KEY") or not os.environ.get("ADOBE_COMMERCE_PRIVATE_KEY"):
+                              return "skip", "Adobe Commerce auth keys not configured", None, None
+                      elif name.startswith("smtp"):
+                          if not os.environ.get("SMTP_HOST") or not os.environ.get("SMTP_PORT") or not os.environ.get("SMTP_USERNAME") or not os.environ.get("SMTP_PASSWORD") or not os.environ.get("SMTP_FROM"):
+                              return "skip", "SMTP credentials not configured", None, None
+
+              non_secret_flags = []
+              secret_flag_names = []
+              for field in manifest.get("dataFields", []):
+                  if field_is_secret(field):
+                      secret_flag_names.append(field['name'])
+                  else:
+                      value = resolve_field_value(field)
+                      if value is not None:
+                          sanitized = sanitize_shell_value(str(value))
+                          non_secret_flags.append("-f")
+                          non_secret_flags.append(f"{field['name']}:{sanitized}")
+
+              return "test", slug, non_secret_flags, secret_flag_names
+
+          repo_root = os.environ.get("GITHUB_WORKSPACE", ".")
+          all_items = []
+          test_items = []
+
+          for cat_dir in CATALOG_DIRS:
+              cat_path = os.path.join(repo_root, cat_dir)
+              if not os.path.isdir(cat_path):
+                  continue
+              for entry in sorted(os.listdir(cat_path)):
+                  entry_path = os.path.join(cat_path, entry)
+                  if not os.path.isdir(entry_path):
+                      continue
+                  manifest_path = find_manifest(entry_path)
+                  try:
+                      manifest = parse_manifest(manifest_path) if manifest_path else None
+                  except Exception as parse_err:
+                      all_items.append({
+                          "slug": entry, "category": cat_dir,
+                          "status": "skip",
+                          "error": f"Manifest parse error: {parse_err}",
+                      })
+                      continue
+
+                  status, detail, flags, secret_flag_names = classify_item(manifest, entry, entry_path)
+
+                  item = {"slug": entry, "category": cat_dir, "status": status}
+                  if status == "test":
+                      item["slug"] = detail
+                      item["installFlags"] = json.dumps(flags)
+                      item["needsSecretFlags"] = "true" if secret_flag_names else "false"
+                      item["secretFlagNames"] = json.dumps(secret_flag_names)
+                      test_items.append(item)
+                      item["error"] = None
+                  else:
+                      item["error"] = detail
+                  all_items.append(item)
+
+          # Output results even if no testable items
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("matrix=" + json.dumps(test_items) + "\n")
+              f.write("all_items=" + json.dumps(all_items) + "\n")
+
+          summary = []
+          summary.append(f"Discovered {len(all_items)} items, {len(test_items)} testable")
+          for item in all_items:
+              if item["status"] == "skip":
+                  summary.append(f"  SKIP {item['slug']}: {item['error']}")
+          for item in test_items:
+              summary.append(f"  TEST {item['slug']}")
+          print("\n".join(summary))
+          PYEOF
+
+  test:
+    needs: [discover]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        item: ${{ fromJson(needs.discover.outputs.matrix) }}
+      fail-fast: false
+      max-parallel: 4
+    steps:
+      - name: Get latest OS version
+        id: os-version
+        run: |
+          latest_tag=$(curl -s "https://registry.hub.docker.com/v2/repositories/goinfinite/os/tags?page_size=5" | jq -r '.results | sort_by(.last_updated) | reverse[] | .name' | grep -v latest | head -1)
+          if [ -z "${latest_tag}" ]; then
+            echo "::error::No usable OS image tag found from Docker Hub"
+            exit 1
+          fi
+          echo "OS image tag: ${latest_tag}"
+          echo "os_tag=${latest_tag}" >> "$GITHUB_OUTPUT"
+      - name: Pull OS image
+        env:
+          OS_TAG: ${{ steps.os-version.outputs.os_tag }}
+        run: docker pull docker.io/goinfinite/os:${OS_TAG}
+      - name: Start container
+        id: start
+        env:
+          ITEM_SLUG: ${{ matrix.item.slug }}
+          OS_TAG: ${{ steps.os-version.outputs.os_tag }}
+        run: |
+          container_name="${ITEM_SLUG}-ci-${{ github.run_id }}"
+          echo "container_name=${container_name}" >> "$GITHUB_OUTPUT"
+          docker run -d --rm \
+            --name "${container_name}" \
+            --cpus=2 \
+            --memory=4G \
+            --env "PRIMARY_VHOST=goinfinite.local" \
+            --env "LOG_LEVEL=debug" \
+            docker.io/goinfinite/os:${OS_TAG}
+      - name: Wait for container readiness
+        env:
+          CONTAINER_NAME: ${{ steps.start.outputs.container_name }}
+        run: |
+          for attempt in $(seq 1 12); do
+            if docker exec "${CONTAINER_NAME}" os version >/dev/null 2>&1; then
+              echo "Container ready (attempt ${attempt})"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Container did not become ready within 60s"
+          exit 1
+      - name: Install marketplace item
+        env:
+          CONTAINER_NAME: ${{ steps.start.outputs.container_name }}
+          ITEM_SLUG: ${{ matrix.item.slug }}
+          INSTALL_FLAGS_JSON: ${{ matrix.item.installFlags }}
+          NEEDS_SECRET_FLAGS: ${{ matrix.item.needsSecretFlags }}
+          SECRET_FLAG_NAMES_JSON: ${{ matrix.item.secretFlagNames }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+          ADOBE_COMMERCE_PUBLIC_KEY: ${{ secrets.ADOBE_COMMERCE_PUBLIC_KEY }}
+          ADOBE_COMMERCE_PRIVATE_KEY: ${{ secrets.ADOBE_COMMERCE_PRIVATE_KEY }}
+        run: |
+          result_file="result-${ITEM_SLUG}.json"
+          tmp_out=$(mktemp)
+
+          flags=()
+          while IFS= read -r arg; do
+              flags+=("$arg")
+          done < <(python3 -c "import json,sys; [print(a) for a in json.loads(sys.argv[1])]" "$INSTALL_FLAGS_JSON")
+
+          if [ "$NEEDS_SECRET_FLAGS" = "true" ]; then
+              while IFS= read -r field_name; do
+                  case "$field_name" in
+                      smtpHost)               val="${SMTP_HOST}" ;;
+                      smtpPort)               val="${SMTP_PORT}" ;;
+                      smtpUsername)           val="${SMTP_USERNAME}" ;;
+                      smtpPassword)           val="${SMTP_PASSWORD}" ;;
+                      smtpFrom)               val="${SMTP_FROM}" ;;
+                      adobeCommercePublicKey)  val="${ADOBE_COMMERCE_PUBLIC_KEY}" ;;
+                      adobeCommercePrivateKey) val="${ADOBE_COMMERCE_PRIVATE_KEY}" ;;
+                      *)                      val="" ;;
+                  esac
+                  if [ -n "$val" ]; then
+                      flags+=("-f" "${field_name}:${val}")
+                  fi
+              done < <(python3 -c "import json,sys; [print(a) for a in json.loads(sys.argv[1])]" "$SECRET_FLAG_NAMES_JSON")
+          fi
+
+          set +e
+          docker exec "${CONTAINER_NAME}" \
+            os mktplace install -s "${ITEM_SLUG}" -n goinfinite.local -d / \
+            "${flags[@]}" \
+            > "${tmp_out}" 2>&1
+          exit_code=$?
+          set -e
+
+          CI_SLUG="${ITEM_SLUG}" CI_EXIT="${exit_code}" CI_OUT="${tmp_out}" CI_RESULT="${result_file}" \
+            python3 -c "
+          import json, os, re
+
+          REDACT_PATTERNS = [
+              (r'(smtpPassword[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpUsername[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpHost[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpPort[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(smtpFrom[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(adobeCommercePublicKey[=:])\s*\S+', r'\1***REDACTED***'),
+              (r'(adobeCommercePrivateKey[=:])\s*\S+', r'\1***REDACTED***'),
+          ]
+
+          with open(os.environ['CI_OUT']) as f:
+              output = f.read()
+
+          for pattern, replacement in REDACT_PATTERNS:
+              output = re.sub(pattern, replacement, output)
+
+          with open(os.environ['CI_RESULT'], 'w') as f:
+              json.dump({
+                  'slug': os.environ['CI_SLUG'],
+                  'exitCode': int(os.environ['CI_EXIT']),
+                  'output': output
+              }, f)
+          "
+          rm -f "${tmp_out}"
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
+          echo "Exit code: ${exit_code}"
+      - name: Upload result artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-${{ matrix.item.slug }}
+          path: result-${{ matrix.item.slug }}.json
+      - name: Cleanup container
+        if: always()
+        env:
+          CONTAINER_NAME: ${{ steps.start.outputs.container_name }}
+        run: |
+          docker rm -f "${CONTAINER_NAME}" 2>/dev/null || true
+
+  report:
+    needs: [discover, test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Download result artifacts
+        if: always()
+        uses: actions/download-artifact@v4
+        with:
+          path: results/
+          merge-multiple: true
+      - name: Generate job summary
+        if: always()
+        env:
+          ALL_ITEMS: ${{ needs.discover.outputs.all_items }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, glob
+
+          all_items_raw = os.environ.get("ALL_ITEMS", "[]")
+          all_items = json.loads(all_items_raw)
+
+          test_results = {}
+          for result_path in glob.glob("results/result-*.json"):
+              with open(result_path) as f:
+                  data = json.load(f)
+              test_results[data["slug"]] = data
+
+          lines = []
+          lines.append("# Marketplace CI Results")
+          lines.append("")
+          lines.append("| Item | Category | Status | Details |")
+          lines.append("|---|---|---|---|")
+
+          failures = 0
+          for item in all_items:
+              slug = item["slug"]
+              category = item["category"]
+              status = item["status"]
+              error = item.get("error") or ""
+
+              if status == "test" and slug in test_results:
+                  tr = test_results[slug]
+                  exit_code = tr.get("exitCode", -1)
+                  if exit_code == 0:
+                      test_status = "PASS"
+                      detail = ""
+                  else:
+                      test_status = "FAIL"
+                      failures += 1
+                      output = tr.get("output", "")
+                      last_line = output.strip().split("\n")[-1] if output.strip() else ""
+                      detail = (last_line or f"exit code {exit_code}")[:120]
+              elif status == "test":
+                  test_status = "SKIP"
+                  detail = "No result artifact found"
+              else:
+                  test_status = "SKIP"
+                  detail = error
+
+              lines.append(f"| {slug} | {category} | {test_status} | {detail} |")
+
+          if not all_items:
+              lines.append("| _No items discovered_ | - | - | - |")
+
+          summary = "\n".join(lines)
+
+          step_summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if step_summary_path:
+              with open(step_summary_path, "a") as f:
+                  f.write(summary + "\n")
+
+          print(summary)
+          print()
+
+          passed = sum(1 for i in all_items if i["status"] == "test" and test_results.get(i["slug"], {}).get("exitCode") == 0)
+          failed_count = failures
+          skipped = sum(1 for i in all_items if i["status"] == "skip")
+          print(f"Summary: {passed} passed, {failed_count} failed, {skipped} skipped")
+
+          if failures > 0:
+              print(f"::error::Marketplace CI failed for {failures} item(s)")
+              exit(1)
+
+          if not all_items:
+              print("No items were discovered. Check repository structure.")
+          PYEOF
