@@ -8,6 +8,9 @@
 fix: enable PHP IMAP extension during Mautic install
   - Adds runtime php update-module for imap to resolve composer dependency error
 
+fix: set utf8mb4 collation on Moodle database before install
+  - Adds ALTER DATABASE to avoid charset mismatch during installation
+
 # 2026/07/23
 
 fix: add services field to hermes-dashboard manifest
