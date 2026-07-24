@@ -1,8 +1,13 @@
 # CHANGELOG
 
 ## v2
-
 ```
+
+# 2026/07/24
+
+fix: enable PHP IMAP extension during Mautic install
+  - Adds runtime php update-module for imap to resolve composer dependency error
+
 # 2026/07/23
 
 fix: add services field to hermes-dashboard manifest

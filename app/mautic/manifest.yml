@@ -39,6 +39,7 @@ dataFields:
 installCmdSteps:
   - os runtime php update --hostname %installHostname% --version 8.3
   - os runtime php update-setting --hostname %installHostname% --name memory_limit --value 512M --version 8.3
+  - os runtime php update-module --hostname %installHostname% --name imap --status true --version 8.3
   - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
   - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
   - mise use node@lts && source /etc/profile
