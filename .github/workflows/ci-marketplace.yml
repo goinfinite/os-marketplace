@@ -10,6 +10,21 @@ permissions:
 jobs:
   discover:
     runs-on: ubuntu-latest
+    env:
+      CI_DOMAIN: goinfinite.dev
+      CI_EMAIL: ci-test@goinfinite.dev
+      CI_PASSWORD: CITestP@ss123!
+      CI_USERNAME: ci_tester
+      CI_FIRST_NAME: CI
+      CI_LAST_NAME: Tester
+      CI_LOCALE: en_US
+      CI_TIMEZONE: America/Los_Angeles
+      CI_CURRENCY: USD
+      CI_EDITION: community
+      CI_SITE_FULL_NAME: CI Test Site
+      CI_SITE_SHORT_NAME: CI-Test
+      CI_BUILDER_SUBDOMAIN: builder-ci
+      CI_DEFAULT_VALUE: ci_test_value
     outputs:
       matrix: ${{ steps.discover.outputs.matrix }}
       all_items: ${{ steps.discover.outputs.all_items }}
@@ -38,18 +53,18 @@ jobs:
           CATALOG_DIRS = ["app", "framework", "stack"]
 
           NAME_BASED_VALUES = {
-              "adminMailAddress": "ci-test@goinfinite.local",
-              "adminPassword": "CITestP@ss123!",
-              "adminUsername": "ci_tester",
-              "adminFirstName": "CI",
-              "adminLastName": "Tester",
-              "locale": "en_US",
-              "timezone": "America/Los_Angeles",
-              "currency": "USD",
-              "edition": "community",
-              "siteFullName": "CI Test Site",
-              "siteShortName": "CI-Test",
-              "builderSubdomain": "builder-ci",
+              "adminMailAddress": os.environ["CI_EMAIL"],
+              "adminPassword": os.environ["CI_PASSWORD"],
+              "adminUsername": os.environ["CI_USERNAME"],
+              "adminFirstName": os.environ["CI_FIRST_NAME"],
+              "adminLastName": os.environ["CI_LAST_NAME"],
+              "locale": os.environ["CI_LOCALE"],
+              "timezone": os.environ["CI_TIMEZONE"],
+              "currency": os.environ["CI_CURRENCY"],
+              "edition": os.environ["CI_EDITION"],
+              "siteFullName": os.environ["CI_SITE_FULL_NAME"],
+              "siteShortName": os.environ["CI_SITE_SHORT_NAME"],
+              "builderSubdomain": os.environ["CI_BUILDER_SUBDOMAIN"],
           }
 
           def find_manifest(entry_dir):
@@ -81,11 +96,11 @@ jobs:
 
               specific_type = field.get("specificType")
               if specific_type == "email":
-                  return "ci-test@goinfinite.local"
+                  return os.environ["CI_EMAIL"]
               if specific_type == "password":
-                  return "CITestP@ss123!"
+                  return os.environ["CI_PASSWORD"]
               if specific_type == "username":
-                  return "ci_tester"
+                  return os.environ["CI_USERNAME"]
 
               if field.get("type") == "select" and field.get("options"):
                   return str(field["options"][0])
@@ -93,7 +108,7 @@ jobs:
               if name in NAME_BASED_VALUES:
                   return NAME_BASED_VALUES[name]
 
-              return "ci_test_value"
+              return os.environ["CI_DEFAULT_VALUE"]
 
           def classify_item(manifest, entry, entry_dir):
               if manifest is None:
@@ -187,6 +202,8 @@ jobs:
   test:
     needs: [discover]
     runs-on: ubuntu-latest
+    env:
+      CI_DOMAIN: goinfinite.dev
     strategy:
       matrix:
         item: ${{ fromJson(needs.discover.outputs.matrix) }}
@@ -219,7 +236,7 @@ jobs:
             --name "${container_name}" \
             --cpus=2 \
             --memory=4G \
-            --env "PRIMARY_VHOST=goinfinite.local" \
+            --env "PRIMARY_VHOST=${CI_DOMAIN}" \
             --env "LOG_LEVEL=debug" \
             docker.io/goinfinite/os:${OS_TAG}
       - name: Wait for container readiness
@@ -278,7 +295,7 @@ jobs:
 
           set +e
           docker exec "${CONTAINER_NAME}" \
-            os mktplace install -s "${ITEM_SLUG}" -n goinfinite.local -d / \
+            os mktplace install -s "${ITEM_SLUG}" -n "${CI_DOMAIN}" -d / \
             "${flags[@]}" \
             > "${tmp_out}" 2>&1
           exit_code=$?
