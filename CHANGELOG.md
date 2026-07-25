@@ -11,6 +11,12 @@ fix: enable PHP IMAP extension during Mautic install
 fix: set utf8mb4 collation on Moodle database before install
   - Adds ALTER DATABASE to avoid charset mismatch during installation
 
+refactor: extract CI test values to env vars and switch domain to goinfinite.dev
+  - Moves hardcoded email, password, names, locale, and domain from inline
+    Python strings to workflow-level environment variables
+  - Switches PRIMARY_VHOST from goinfinite.local to goinfinite.dev for valid MX
+    records, fixing passbolt GPG email validation
+
 # 2026/07/23
 
 fix: add services field to hermes-dashboard manifest
