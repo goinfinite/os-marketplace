@@ -789,6 +789,8 @@
     "os runtime php update -n '%installHostname%' -v 8.2",
     "os vhost mapping create -n '%installHostname%' -p '%installUrlPath%' -t service -v php >/dev/null 2>&1 || true",
     "composer init --name=openmage/openmage -d %installDirectory% -n -q",
+    "composer config minimum-stability dev -f %installDirectory%/composer.json -q",
+    "composer config prefer-stable true -f %installDirectory%/composer.json -q",
     "composer config --json extra.enable-patching true -f %installDirectory%/composer.json -q",
     "composer config extra.magento-core-package-type magento-source -f %installDirectory%/composer.json -q",
     "composer config extra.magento-root-dir %installDirectory% -f %installDirectory%/composer.json -q",
