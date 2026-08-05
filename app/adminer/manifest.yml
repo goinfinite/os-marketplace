@@ -14,7 +14,7 @@ mappings:
     targetValue: php
 installCmdSteps:
   - wget "https://github.com/vrana/adminer/releases/download/v5.3.0/adminer-5.3.0.php" -O %installDirectory%/index.php
-  - wget "https://raw.githubusercontent.com/vrana/adminer/refs/heads/master/designs/pepa-linha/adminer.css" -O %installDirectory%/adminer.css
+  - wget "https://raw.githubusercontent.com/vrana/adminer/refs/heads/main/designs/pepa-linha/adminer.css" -O %installDirectory%/adminer.css
   - |
     if [[ -d /etc/postgresql/ ]]; then
       sed -i.backup 's/local.*all.*all.*peer/local all all md5/' /etc/postgresql/*/main/pg_hba.conf
