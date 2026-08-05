@@ -246,6 +246,8 @@ jobs:
           for attempt in $(seq 1 12); do
             if docker exec "${CONTAINER_NAME}" os version >/dev/null 2>&1; then
               echo "Container ready (attempt ${attempt})"
+              echo "Waiting 15s for nginx config synchronization..."
+              sleep 15
               exit 0
             fi
             sleep 5
