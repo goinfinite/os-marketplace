@@ -232,10 +232,15 @@ jobs:
         run: |
           container_name="${ITEM_SLUG}-ci-${{ github.run_id }}"
           echo "container_name=${container_name}" >> "$GITHUB_OUTPUT"
+          add_host_flag=""
+          if [ "${ITEM_SLUG}" = "openmage" ]; then
+            add_host_flag="--add-host ${CI_DOMAIN}:127.0.0.1"
+          fi
           docker run -d --rm \
             --name "${container_name}" \
             --cpus=2 \
             --memory=4G \
+            ${add_host_flag} \
             --env "PRIMARY_VHOST=${CI_DOMAIN}" \
             --env "LOG_LEVEL=debug" \
             docker.io/goinfinite/os:${OS_TAG}
