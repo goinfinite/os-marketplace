@@ -15,9 +15,20 @@ mappings:
     targetType: service
     targetValue: php
 installCmdSteps:
-  - curl -skL -o /app/composer-setup.php https://getcomposer.org/installer
+  - install_packages -qqy jq
+  - curl -sL -o /app/composer-setup.php https://getcomposer.org/installer
   - php /app/composer-setup.php --install-dir=/usr/local/bin --filename=composer --quiet && rm -f /app/composer-setup.php
   - mkdir -p %installDirectory% && chown nobody:nogroup %installDirectory%
+  - |
+    timeout=60
+    elapsed=0
+    until os services get 2>/dev/null | jq -e '.body.installedServices[] | select(.name == "php-webserver") | .status == "running"' >/dev/null 2>&1; do
+      if [ $elapsed -ge $timeout ]; then
+        exit 1
+      fi
+      sleep 2
+      elapsed=$((elapsed + 2))
+    done
   - os runtime php run --hostname %installHostname% --command '/usr/local/bin/composer --no-dev --no-cache create-project phpmyadmin/phpmyadmin %installDirectory%'
   - os runtime php update --hostname %installHostname% --version 8.3
 uninstallFileNames:
