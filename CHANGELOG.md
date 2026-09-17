@@ -10,6 +10,15 @@ docs: add feature map and per-directory context files
   - Adds .context.md files for docs/, assets directories, and new apps
   - Updates drifted app context files against current manifests
 
+docs: correct catalog and CI coverage descriptions
+  - Nightly CI installs every eligible catalog item, not every item
+  - Describes the repo as a data catalog whose workflows and installCmdSteps
+    contain executable commands
+  - Fixes the app/ item count to the 20 manifest-backed entries
+
+chore: remove supabase placeholder directory
+  - Held no manifest or assets, only context notes
+
 # 2026/07/24
 
 fix: enable PHP IMAP extension during Mautic install
