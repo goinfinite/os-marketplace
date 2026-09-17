@@ -3,6 +3,13 @@
 ## v2
 ```
 
+# 2026/09/17
+
+docs: add feature map and per-directory context files
+  - Creates docs/FEATURE-MAP.md tracing marketplace features through the code
+  - Adds .context.md files for docs/, assets directories, and new apps
+  - Updates drifted app context files against current manifests
+
 # 2026/07/24
 
 fix: enable PHP IMAP extension during Mautic install
