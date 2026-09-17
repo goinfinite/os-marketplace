@@ -2,7 +2,7 @@
 
 > Auto-maintained index of every user-facing feature and the code path that implements it. Updated alongside the code — not after the fact.
 
-This repository holds no executable code. It is a data catalog: Infinite OS (external, https://github.com/goinfinite/os) fetches these manifests via Git and executes the install steps on the user's instance. Feature paths below therefore run from manifest entry point to the external executor.
+This repository is a data catalog with no application source files: Infinite OS (external, https://github.com/goinfinite/os) fetches these manifests via Git and executes the install steps on the user's instance. GitHub Actions workflows and manifest `installCmdSteps` do contain executable commands. Feature paths below therefore run from manifest entry point to the external executor.
 
 ## Catalog Item Installation
 
@@ -49,7 +49,7 @@ A user (or Infinite OS itself) pins the marketplace to a repository version comp
 
 ## Marketplace CI Install Testing
 
-A nightly job installs every catalog item into a fresh Infinite OS container and reports pass/fail per item.
+A nightly job installs every eligible catalog item into a fresh Infinite OS container and reports pass/fail per item.
 
 **Flow:**
 
