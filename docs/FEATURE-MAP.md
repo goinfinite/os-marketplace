@@ -68,7 +68,7 @@ A contributor adds or changes a marketplace item and gets it merged.
 
 1. `README.md` — manifest schema reference: required properties, `dataFields` shape, system placeholder list
 2. `app|framework|stack/<item>/manifest.(json|yml|yaml)` — the new manifest, following the pattern of existing items (e.g. `app/wordpress/manifest.json`)
-3. `app/<item>/assets/avatar.jpg` — required icon; screenshots optional (guidance in `README.md`, Avatars section)
+3. `app|framework|stack/<item>/assets/avatar.(jpg|png)` — required icon; screenshots optional (guidance in `README.md`, Avatars section)
 4. `CONTRIBUTING.md` — process rules: open an issue first, sign the FLA, Conventional Commits, maintainer approval
 5. `.github/workflows/ci-marketplace.yml` — validates the item installs on the next nightly run
 

@@ -25,6 +25,9 @@ docs: use extension-neutral manifest paths in feature map
 docs: make feature map manifest paths directory-neutral
   - CI testing and contributing flows cover app/, framework/, and stack/ items
 
+docs: make feature map avatar path directory and extension neutral
+  - Contributing flow now references avatar.(jpg|png) under any catalog root
+
 # 2026/07/24
 
 fix: enable PHP IMAP extension during Mautic install
