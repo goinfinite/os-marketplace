@@ -19,6 +19,9 @@ docs: correct catalog and CI coverage descriptions
 chore: remove supabase placeholder directory
   - Held no manifest or assets, only context notes
 
+docs: use extension-neutral manifest paths in feature map
+  - Testing and contributing flows now reference manifest.(json|yml|yaml)
+
 # 2026/07/24
 
 fix: enable PHP IMAP extension during Mautic install
