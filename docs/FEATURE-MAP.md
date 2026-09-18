@@ -55,7 +55,7 @@ A nightly job installs every eligible catalog item into a fresh Infinite OS cont
 
 1. `.github/workflows/ci-marketplace.yml` (`discover` job) — parses every manifest under `app/`, `framework/`, `stack/`, resolves `dataFields` values, builds a test matrix, skips items without slugs or missing secrets
 2. `.github/workflows/ci-marketplace.yml` (`test` job) — pulls the latest `goinfinite/os` Docker image, starts a container, runs `os mktplace install -s <slug>` inside it
-3. `app/<item>/manifest.(json|yml|yaml)` — the manifest under test; its `installCmdSteps` execute inside the container
+3. `app|framework|stack/<item>/manifest.(json|yml|yaml)` — the manifest under test; its `installCmdSteps` execute inside the container
 4. `.github/workflows/ci-marketplace.yml` (`report` job) — downloads result artifacts, writes a PASS/FAIL/SKIP table to the job summary, fails the run on any install failure
 
 ---
@@ -67,7 +67,7 @@ A contributor adds or changes a marketplace item and gets it merged.
 **Flow:**
 
 1. `README.md` — manifest schema reference: required properties, `dataFields` shape, system placeholder list
-2. `app/<item>/manifest.(json|yml|yaml)` — the new manifest, following the pattern of existing items (e.g. `app/wordpress/manifest.json`)
+2. `app|framework|stack/<item>/manifest.(json|yml|yaml)` — the new manifest, following the pattern of existing items (e.g. `app/wordpress/manifest.json`)
 3. `app/<item>/assets/avatar.jpg` — required icon; screenshots optional (guidance in `README.md`, Avatars section)
 4. `CONTRIBUTING.md` — process rules: open an issue first, sign the FLA, Conventional Commits, maintainer approval
 5. `.github/workflows/ci-marketplace.yml` — validates the item installs on the next nightly run

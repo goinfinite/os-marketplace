@@ -22,6 +22,9 @@ chore: remove supabase placeholder directory
 docs: use extension-neutral manifest paths in feature map
   - Testing and contributing flows now reference manifest.(json|yml|yaml)
 
+docs: make feature map manifest paths directory-neutral
+  - CI testing and contributing flows cover app/, framework/, and stack/ items
+
 # 2026/07/24
 
 fix: enable PHP IMAP extension during Mautic install
