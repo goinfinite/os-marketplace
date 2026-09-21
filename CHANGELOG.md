@@ -10,6 +10,11 @@ fix: remove unsupported PHP imap module step from Mautic install
   - Composer now ignores the ext-imap platform requirement; Mautic treats imap as optional
   - The install creates var/cache and var/logs before mautic:install, which aborts silently without them
 
+fix: switch Moodle download to the current stable branch 5.2
+  - Legacy stable405 downloads fail from datacenter IPs; CI hit wget exit 8 daily
+  - Moodle 5.x serves from public/; the install links the site root to that directory
+  - PHP 8.3 meets the new minimum; installer flags and cron paths still apply
+
 # 2026/09/17
 
 docs: add feature map and per-directory context files
