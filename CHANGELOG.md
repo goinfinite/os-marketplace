@@ -3,6 +3,13 @@
 ## v2
 ```
 
+# 2026-09-21
+
+fix: remove unsupported PHP imap module step from Mautic install
+  - The OS supports no imap module for any PHP version; the step always failed
+  - Composer now ignores the ext-imap platform requirement; Mautic treats imap as optional
+  - The install creates var/cache and var/logs before mautic:install, which aborts silently without them
+
 # 2026/09/17
 
 docs: add feature map and per-directory context files
