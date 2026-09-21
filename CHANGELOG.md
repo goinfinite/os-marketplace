@@ -15,6 +15,11 @@ fix: switch Moodle download to the current stable branch 5.2
   - Moodle 5.x serves from public/; the install links the site root to that directory
   - PHP 8.3 meets the new minimum; installer flags and cron paths still apply
 
+fix: bump Umami pnpm to 12.3.4 and cap build memory
+  - Upstream engines.pnpm requires 12.3.4; pnpm 10.33 aborted with ERR_PNPM_UNSUPPORTED_ENGINE
+  - The next build runs with a 2.5 GB V8 heap cap to fit the 4 GB container
+  - The start script runs next through node directly; the OS strips exec bits after install
+
 # 2026/09/17
 
 docs: add feature map and per-directory context files
