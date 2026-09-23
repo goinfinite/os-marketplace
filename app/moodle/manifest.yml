@@ -40,10 +40,10 @@ dataFields:
     defaultValue: Moodle
     isRequired: true
 installCmdSteps:
-  - wget -q -S https://github.com/moodle/moodle/archive/344232c15336c71b80f9aca8359ce0e0a9f3d116.tar.gz -O %installTempDir%/moodle.tgz
+  - wget -q -S https://github.com/moodle/moodle/archive/refs/tags/v5.2.3.tar.gz -O %installTempDir%/moodle.tgz
   - |
     cd %installTempDir%
-    expectedArchiveSha256="ad2d1d4200551531b18e5996bb49730aa9d1e5bbadfa5b86233d48d29470b40a"
+    expectedArchiveSha256="067633d65a1dc196354c3fddbcedee40a329673279416350a8d4f74898fda8a1"
     actualArchiveSha256="$(sha256sum moodle.tgz | awk '{ print $1 }')"
     if [ "$actualArchiveSha256" != "$expectedArchiveSha256" ]; then echo "MoodleArchiveDigestMismatch expected=$expectedArchiveSha256 actual=$actualArchiveSha256"; exit 1; fi
   - cd %installTempDir% && mkdir moodle && tar -xzf moodle.tgz --strip-components=1 -C moodle

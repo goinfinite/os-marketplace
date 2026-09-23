@@ -5,11 +5,11 @@
 
 # 2026-09-22
 
-fix: download Moodle from a digest-verified commit pin on the GitHub mirror
+fix: download Moodle from a digest-verified tag pin on the GitHub mirror
   - download.moodle.org 302-redirects to packaging.moodle.org; Cloudflare there serves a "Moodle challenge" 403 to datacenter IPs, so CI wget hit exit 8 again (run 35708392217)
-  - The install now fetches commit 344232c15336c71b80f9aca8359ce0e0a9f3d116 from the official moodle/moodle GitHub mirror — the same host CI already reaches for the marketplace clone. A commit cannot be retargeted, unlike a tag or the floating moodle-latest tarball.
-  - The install verifies the archive's SHA-256 digest before extraction and aborts on mismatch
-  - The archive extracts under a moodle-<commit>/ prefix; the tar step strips it into the expected moodle/ dir
+  - The install now fetches tag v5.2.3 from the official moodle/moodle GitHub mirror — the same host CI already reaches for the marketplace clone. The version is readable at a glance in the URL.
+  - The install verifies the archive's SHA-256 digest before extraction and aborts on mismatch. The guard makes the tag pin fail closed if the tag is ever retargeted.
+  - The tag archive carries a moodle-<tag>/ prefix, so its digest differs from the equivalent commit archive; the content tree is identical
   - estimatedSizeBytes now matches the measured 5.2 tree (432 MB), not the old 4.5 tarball
 
 # 2026-09-21
