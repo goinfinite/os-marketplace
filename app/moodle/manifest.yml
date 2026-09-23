@@ -40,8 +40,8 @@ dataFields:
     defaultValue: Moodle
     isRequired: true
 installCmdSteps:
-  - wget -q https://download.moodle.org/download.php/direct/stable502/moodle-latest-502.tgz -O %installTempDir%/moodle.tgz
-  - cd %installTempDir% && tar -xzf moodle.tgz
+  - wget -q -S https://github.com/moodle/moodle/archive/refs/tags/v5.2.3.tar.gz -O %installTempDir%/moodle.tgz
+  - cd %installTempDir% && mkdir moodle && tar -xzf moodle.tgz --strip-components=1 -C moodle
   - rm -fr %installDirectory% && mv %installTempDir%/moodle /app/moodle_%installUuid% && chown -R nobody:nogroup /app/moodle_%installUuid%
   - cp -u %marketplaceCatalogItemAssetsDirPath%/.htaccess /app/moodle_%installUuid%/public/
   - ln -s /app/moodle_%installUuid%/public %installDirectory%
@@ -64,7 +64,7 @@ uninstallCmdSteps:
   - os db delete --db-type mysql --db-name moodle_%installUuid%
   - os cron delete -d 'MoodleCron'
 installTimeoutSecs: 900
-estimatedSizeBytes: 372349285
+estimatedSizeBytes: 432272303
 avatarUrl: https://goinfinite.github.io/os-marketplace/app/moodle/assets/avatar.png
 screenshotUrls:
   - https://goinfinite.github.io/os-marketplace/app/moodle/assets/screenshot-1.png

@@ -3,6 +3,14 @@
 ## v2
 ```
 
+# 2026-09-22
+
+fix: download Moodle from the version-pinned GitHub mirror tag
+  - download.moodle.org 302-redirects to packaging.moodle.org; Cloudflare there serves a "Moodle challenge" 403 to datacenter IPs, so CI wget hit exit 8 again (run 35708392217)
+  - The install now fetches tag v5.2.3 from the official moodle/moodle GitHub mirror — the same host CI already reaches for the marketplace clone; the tag is immutable, unlike the floating moodle-latest tarball
+  - The archive extracts under a moodle-5.2.3/ prefix; the tar step strips it into the expected moodle/ dir
+  - estimatedSizeBytes now matches the measured 5.2 tree (432 MB), not the old 4.5 tarball
+
 # 2026-09-21
 
 fix: remove unsupported PHP imap module step from Mautic install
