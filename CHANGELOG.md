@@ -6,9 +6,8 @@
 # 2026-09-28
 
 fix: set GOMEMLIMIT for marketplace PocketBase instances
-  - A customer PocketBase instance consumed all node RAM and caused downtimes; the on-node supervisord fix did not survive config regeneration
-  - The install now passes `--envs GOMEMLIMIT=2GiB` to `os services create-custom`, so the limit lives in the installed-service record and lands in every generated supervisord conf
-  - GOMEMLIMIT is a soft Go runtime limit: the GC turns aggressive near 2 GiB; the OS only OOM-kills if the heap exceeds it anyway
+  - The install passes `--envs GOMEMLIMIT=2GiB` to `os services create-custom`, so the limit lives in the installed-service record and survives supervisord conf regeneration
+  - GOMEMLIMIT is a soft Go runtime limit: the heap can exceed it and the OS can still OOM-kill the process under node memory pressure
 
 # 2026-09-22
 
