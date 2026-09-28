@@ -34,6 +34,7 @@ installCmdSteps:
       --auto-start true \
       --auto-restart true \
       --start-command "%installDirectory%/pocketbase serve" \
+      --envs GOMEMLIMIT=2GiB \
       --mapping-hostname %installHostname% \
       --mapping-path %installUrlPath%
   - sleep 5
