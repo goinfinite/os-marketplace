@@ -3,6 +3,12 @@
 ## v2
 ```
 
+# 2026-09-28
+
+fix: set GOMEMLIMIT for marketplace PocketBase instances
+  - The install passes `--envs GOMEMLIMIT=2GiB` to `os services create-custom`, so the limit lives in the installed-service record and survives supervisord conf regeneration
+  - GOMEMLIMIT is a soft Go runtime limit: the heap can exceed it and the OS can still OOM-kill the process under node memory pressure
+
 # 2026-09-22
 
 fix: download Moodle from a digest-verified tag pin on the GitHub mirror
